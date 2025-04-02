@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Monthly FIR Report</h2>
+    <div>
+      <a href="?format=pdf" class="btn btn-danger mr-2">Download PDF</a>
+      <a href="?format=csv" class="btn btn-success">Download CSV</a>
+    </div>
+  </div>
+
+  <div class="card mb-4">
+    <div class="card-header">
+      <h5>Report Period: {{ start_date|date:"d/m/Y" }} to {{ end_date|date:"d/m/Y" }}</h5>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="table table-bordered">
+          <thead class="thead-dark">
+            <tr>
+              <th>Station</th>
+              <th>Total FIRs</th>
+              <th>Draft</th>
+              <th>Submitted</th>
+              <th>Investigating</th>
+              <th>Closed</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for item in data %}
+            <tr>
+              <td>{{ item.station__name }}</td>
+              <td>{{ item.total_firs }}</td>
+              <td>{{ item.draft_firs }}</td>
+              <td>{{ item.submitted_firs }}</td>
+              <td>{{ item.investigating_firs }}</td>
+              <td>{{ item.closed_firs }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

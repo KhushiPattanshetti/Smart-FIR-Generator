@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Police Stations</h2>
+    <a href="{% url 'station_create' %}" class="btn btn-primary">Add New Station</a>
+  </div>
+
+  <div class="card">
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Location</th>
+              <th>Contact</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for station in stations %}
+            <tr>
+              <td>{{ station.name }}</td>
+              <td>{{ station.location }}</td>
+              <td>{{ station.contact_number }}</td>
+              <td>
+                <a href="{% url 'station_edit' pk=station.pk %}" class="btn btn-sm btn-info">Edit</a>
+                <a href="{% url 'station_delete' pk=station.pk %}" class="btn btn-sm btn-danger">Delete</a>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

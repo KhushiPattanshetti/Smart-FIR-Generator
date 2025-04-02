@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>FIR Details: {{ fir.fir_number }}</h2>
+    <div>
+      <span class="badge badge-{{ fir.get_status_class }}">{{ fir.get_status_display }}</span>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-6">
+      <div class="card mb-4">
+        <div class="card-header">
+          <h5>Case Information</h5>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-6">
+              <p><strong>Complainant:</strong> {{ fir.complainant_name }}</p>
+              <p><strong>Contact:</strong> {{ fir.complainant_contact }}</p>
+              <p><strong>Incident Date:</strong> {{ fir.incident_date|date:"d/m/Y" }}</p>
+            </div>
+            <div class="col-md-6">
+              <p><strong>Location:</strong> {{ fir.incident_location }}</p>
+              <p><strong>Station:</strong> {{ fir.station.name }}</p>
+              <p><strong>Officer:</strong> {{ fir.police_officer.username }}</p>
+            </div>
+          </div>
+          <hr>
+          <p><strong>Description:</strong></p>
+          <p>{{ fir.incident_description }}</p>
+        </div>
+      </div>
+
+      <div class="card mb-4">
+        <div class="card-header">
+          <h5>Reassign Case</h5>
+        </div>
+        <div class="card-body">
+          <form method="post">
+            {% csrf_token %}
+            <div class="form-group">
+              <label for="officer_id">Assign to Officer</label>
+              <select class="form-control" id="officer_id" name="officer_id" required>
+                {% for officer in officers %}
+                <option value="{{ officer.pk }}" {% if officer.pk == fir.police_officer.pk %}selected{% endif %}>{{ officer.username }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <button type="submit" class="btn btn-primary">Reassign</button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-6">
+      <div class="card mb-4">
+        <div class="card-header">
+          <h5>Investigation Details</h5>
+        </div>
+        <div class="card-body">
+          <p><strong>Created At:</strong> {{ fir.created_at|date:"d/m/Y H:i" }}</p>
+          <p><strong>Last Updated:</strong> {{ fir.updated_at|date:"d/m/Y H:i" }}</p>
+          <hr>
+          <h6>Investigation Notes:</h6>
+          <div class="bg-light p-3 mb-3" style="max-height: 200px; overflow-y: auto;">
+            {% for note in fir.investigation_notes.all %}
+            <div class="mb-2">
+              <small class="text-muted">{{ note.created_at|date:"d/m/Y H:i" }} by {{ note.created_by.username }}</small>
+              <p class="mb-1">{{ note.note }}</p>
+              {% if note.translated_text %}
+              <small class="text-muted">Translation: {{ note.translated_text }}</small>
+              {% endif %}
+            </div>
+            {% empty %}
+            <p class="text-muted">No investigation notes yet.</p>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

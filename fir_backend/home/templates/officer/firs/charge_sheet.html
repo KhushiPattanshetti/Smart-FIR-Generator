@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Charge Sheet for FIR: {{ fir.fir_number }}</h2>
+    <a href="?format=pdf" class="btn btn-danger">Download PDF</a>
+  </div>
+
+  <div class="card">
+    <div class="card-body">
+      <div class="charge-sheet">
+        <div class="header text-center mb-4">
+          <h3>OFFICIAL CHARGE SHEET</h3>
+          <h5>{{ fir.station.name }} Police Station</h5>
+          <p class="mb-0">FIR No: {{ fir.fir_number }}</p>
+        </div>
+        
+        <div class="section mb-4">
+          <h5>1. Case Details</h5>
+          <div class="row">
+            <div class="col-md-6">
+              <p><strong>Complainant:</strong> {{ fir.complainant_name }}</p>
+              <p><strong>Incident Date:</strong> {{ fir.incident_date|date:"d/m/Y" }}</p>
+            </div>
+            <div class="col-md-6">
+              <p><strong>Location:</strong> {{ fir.incident_location }}</p>
+              <p><strong>Investigating Officer:</strong> {{ fir.police_officer.username }}</p>
+            </div>
+          </div>
+          <p class="mt-2"><strong>Brief Description:</strong> {{ fir.incident_description }}</p>
+        </div>
+        
+        <div class="section mb-4">
+          <h5>2. Charges</h5>
+          <table class="table table-bordered">
+            <thead class="thead-dark">
+              <tr>
+                <th>IPC Section</th>
+                <th>Description</th>
+                <th>Act</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for suggestion in legal_suggestions %}
+              <tr>
+                <td>{{ suggestion.ipc_section }}</td>
+                <td>{{ suggestion.description }}</td>
+                <td>{{ suggestion.act_name }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        
+        <div class="section mb-4">
+          <h5>3. Evidence</h5>
+          <ul>
+            {% for item in evidence %}
+            <li>{{ item.description }} ({{ item.get_evidence_type_display }})</li>
+            {% empty %}
+            <li>No evidence recorded</li>
+            {% endfor %}
+          </ul>
+        </div>
+        
+        <div class="section mb-4">
+          <h5>4. Witnesses</h5>
+          <table class="table table-bordered">
+            <thead class="thead-dark">
+              <tr>
+                <th>Name</th>
+                <th>Contact</th>
+                <th>Statement</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for witness in witnesses %}
+              <tr>
+                <td>{{ witness.name }}</td>
+                <td>{{ witness.contact }}</td>
+                <td>{{ witness.statement|truncatechars:50 }}</td>
+              </tr>
+              {% empty %}
+              <tr>
+                <td colspan="3">No witnesses recorded</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        
+        <div class="signature-section mt-5">
+          <div class="row">
+            <div class="col-md-6">
+              <p class="border-top pt-2">Investigating Officer</p>
+            </div>
+            <div class="col-md-6 text-right">
+              <p class="border-top pt-2">Station In-Charge</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

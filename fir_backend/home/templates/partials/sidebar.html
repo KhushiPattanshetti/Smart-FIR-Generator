@@ -1,0 +1,56 @@
+<div class="sidebar d-none d-lg-block">
+  <div class="pt-3">
+    {% if is_admin %}
+    <ul class="nav flex-column">
+      <li class="nav-item">
+        <a class="nav-link {% if request.resolver_match.url_name == 'admin_dashboard' %}active{% endif %}" href="{% url 'admin_dashboard' %}">
+          <i class="bi bi-speedometer2"></i> Dashboard
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link {% if 'station' in request.resolver_match.url_name %}active{% endif %}" href="{% url 'station_list' %}">
+          <i class="bi bi-building"></i> Stations
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link {% if 'user' in request.resolver_match.url_name %}active{% endif %}" href="{% url 'user_list' %}">
+          <i class="bi bi-people"></i> Users
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link {% if 'fir' in request.resolver_match.url_name and 'admin' in request.resolver_match.url_name %}active{% endif %}" href="{% url 'admin_fir_list' %}">
+          <i class="bi bi-folder"></i> FIR Management
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link {% if 'report' in request.resolver_match.url_name %}active{% endif %}" href="{% url 'report_generate' %}">
+          <i class="bi bi-graph-up"></i> Reports
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link {% if 'analytics' in request.resolver_match.url_name %}active{% endif %}" href="{% url 'dashboard_analytics' %}">
+          <i class="bi bi-bar-chart-line"></i> Analytics
+        </a>
+      </li>
+    </ul>
+    {% else %}
+    <ul class="nav flex-column">
+      <li class="nav-item">
+        <a class="nav-link {% if request.resolver_match.url_name == 'officer_dashboard' %}active{% endif %}" href="{% url 'officer_dashboard' %}">
+          <i class="bi bi-speedometer2"></i> Dashboard
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link {% if 'fir' in request.resolver_match.url_name and 'officer' in request.resolver_match.url_name %}active{% endif %}" href="{% url 'officer_fir_list' %}">
+          <i class="bi bi-folder"></i> My Cases
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link {% if 'analytics' in request.resolver_match.url_name %}active{% endif %}" href="{% url 'dashboard_analytics' %}">
+          <i class="bi bi-bar-chart-line"></i> Performance
+        </a>
+      </li>
+    </ul>
+    {% endif %}
+  </div>
+</div>

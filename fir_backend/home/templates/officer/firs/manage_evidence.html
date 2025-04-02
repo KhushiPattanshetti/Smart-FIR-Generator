@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Evidence for FIR: {{ fir.fir_number }}</h2>
+    <a href="{% url 'upload_evidence' fir_pk=fir.pk %}" class="btn btn-primary">Upload Evidence</a>
+  </div>
+
+  <div class="card">
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th>Type</th>
+              <th>Description</th>
+              <th>Uploaded By</th>
+              <th>Date</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for evidence in evidence_list %}
+            <tr>
+              <td>{{ evidence.get_evidence_type_display }}</td>
+              <td>{{ evidence.description }}</td>
+              <td>{{ evidence.uploaded_by.username }}</td>
+              <td>{{ evidence.upload_date|date:"d/m/Y H:i" }}</td>
+              <td>
+                <a href="{{ evidence.file.url }}" class="btn btn-sm btn-info" target="_blank">View</a>
+                {% if evidence.uploaded_by == request.user %}
+                <a href="#" class="btn btn-sm btn-danger" onclick="confirmDelete({{ evidence.id }})">Delete</a>
+                {% endif %}
+              </td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="5" class="text-center">No evidence recorded yet</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function confirmDelete(evidenceId) {
+  if (confirm('Are you sure you want to delete this evidence?')) {
+    fetch(`/api/evidence/${evidenceId}/`, {
+      method: 'DELETE',
+      headers: {
+        'X-CSRFToken': '{{ csrf_token }}',
+        'Content-Type': 'application/json'
+      }
+    })
+    .then(response => {
+      if (response.ok) {
+        location.reload();
+      }
+    });
+  }
+}
+</script>
+{% endblock %}

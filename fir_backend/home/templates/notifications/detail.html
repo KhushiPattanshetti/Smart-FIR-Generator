@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid">
+  <div class="card">
+    <div class="card-header">
+      <h5>Notification Details</h5>
+    </div>
+    <div class="card-body">
+      <h6>{{ notification.message }}</h6>
+      <small class="text-muted">{{ notification.created_at|date:"d/m/Y H:i" }}</small>
+      <hr>
+      <p>Related to: <a href="{{ notification.link }}">{{ notification.link }}</a></p>
+    </div>
+  </div>
+</div>
+{% endblock %}

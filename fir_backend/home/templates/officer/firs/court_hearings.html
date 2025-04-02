@@ -1,0 +1,168 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Court Hearings for FIR: {{ fir.fir_number }}</h2>
+    <button class="btn btn-primary" data-toggle="modal" data-target="#addHearingModal">Schedule Hearing</button>
+  </div>
+
+  <div class="card">
+    <div class="card-body">
+      {% if hearings %}
+      <div class="table-responsive">
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Purpose</th>
+              <th>Outcome</th>
+              <th>Next Hearing</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for hearing in hearings %}
+            <tr class="{% if hearing.hearing_date < timezone.now and not hearing.outcome %}table-warning{% endif %}">
+              <td>{{ hearing.hearing_date|date:"d/m/Y H:i" }}</td>
+              <td>{{ hearing.purpose }}</td>
+              <td>{{ hearing.outcome|default:"-" }}</td>
+              <td>
+                {% if hearing.next_hearing_date %}
+                  {{ hearing.next_hearing_date|date:"d/m/Y H:i" }}
+                {% else %}
+                  -
+                {% endif %}
+              </td>
+              <td>
+                <button class="btn btn-sm btn-info" data-toggle="modal" data-target="#viewHearingModal{{ hearing.id }}">View</button>
+                <button class="btn btn-sm btn-warning" data-toggle="modal" data-target="#editHearingModal{{ hearing.id }}">Edit</button>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <div class="alert alert-info">
+        No court hearings scheduled yet.
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<!-- Add Hearing Modal -->
+<div class="modal fade" id="addHearingModal" tabindex="-1" role="dialog" aria-labelledby="addHearingModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="addHearingModalLabel">Schedule New Hearing</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <form method="post" action="{% url 'court_hearings' fir_pk=fir.pk %}">
+        {% csrf_token %}
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="hearing_date">Hearing Date & Time</label>
+            <input type="datetime-local" class="form-control" id="hearing_date" name="hearing_date" required>
+          </div>
+          <div class="form-group">
+            <label for="purpose">Purpose</label>
+            <textarea class="form-control" id="purpose" name="purpose" rows="3" required></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          <button type="submit" class="btn btn-primary">Schedule Hearing</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- View/Edit Modals for each hearing -->
+{% for hearing in hearings %}
+<!-- View Hearing Modal -->
+<div class="modal fade" id="viewHearingModal{{ hearing.id }}" tabindex="-1" role="dialog" aria-labelledby="viewHearingModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="viewHearingModalLabel">Hearing Details</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="col-md-6">
+            <p><strong>Date:</strong> {{ hearing.hearing_date|date:"d/m/Y H:i" }}</p>
+            <p><strong>Scheduled By:</strong> {{ hearing.added_by.username }}</p>
+          </div>
+          <div class="col-md-6">
+            {% if hearing.next_hearing_date %}
+            <p><strong>Next Hearing:</strong> {{ hearing.next_hearing_date|date:"d/m/Y H:i" }}</p>
+            {% endif %}
+          </div>
+        </div>
+        <hr>
+        <p><strong>Purpose:</strong></p>
+        <p>{{ hearing.purpose }}</p>
+        
+        {% if hearing.outcome %}
+        <hr>
+        <p><strong>Outcome:</strong></p>
+        <p>{{ hearing.outcome }}</p>
+        {% endif %}
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Hearing Modal -->
+<div class="modal fade" id="editHearingModal{{ hearing.id }}" tabindex="-1" role="dialog" aria-labelledby="editHearingModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="editHearingModalLabel">Edit Hearing</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <form method="post" action="{% url 'court_hearings' fir_pk=fir.pk %}">
+        {% csrf_token %}
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="hearing_date">Hearing Date & Time</label>
+            <input type="datetime-local" class="form-control" id="hearing_date" name="hearing_date" 
+                   value="{{ hearing.hearing_date|date:'Y-m-d\TH:i' }}" required>
+          </div>
+          <div class="form-group">
+            <label for="purpose">Purpose</label>
+            <textarea class="form-control" id="purpose" name="purpose" rows="3" required>{{ hearing.purpose }}</textarea>
+          </div>
+          <div class="form-group">
+            <label for="outcome">Outcome (if completed)</label>
+            <textarea class="form-control" id="outcome" name="outcome" rows="3">{{ hearing.outcome|default:'' }}</textarea>
+          </div>
+          <div class="form-group">
+            <label for="next_hearing_date">Next Hearing Date (if applicable)</label>
+            <input type="datetime-local" class="form-control" id="next_hearing_date" name="next_hearing_date" 
+                   value="{{ hearing.next_hearing_date|date:'Y-m-d\TH:i' if hearing.next_hearing_date else '' }}">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          <button type="submit" class="btn btn-primary">Save Changes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endfor %}
+{% endblock %}

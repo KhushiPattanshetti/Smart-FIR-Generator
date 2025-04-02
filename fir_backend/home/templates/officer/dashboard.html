@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid">
+  <h2 class="mb-4">Officer Dashboard</h2>
+  
+  <div class="row">
+    <div class="col-md-3">
+      <div class="card text-white bg-primary mb-3">
+        <div class="card-body">
+          <h5 class="card-title">Total Cases</h5>
+          <h2 class="card-text">{{ total_firs }}</h2>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card text-white bg-warning mb-3">
+        <div class="card-body">
+          <h5 class="card-title">Pending Cases</h5>
+          <h2 class="card-text">{{ pending_firs }}</h2>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card text-white bg-danger mb-3">
+        <div class="card-body">
+          <h5 class="card-title">Overdue Cases</h5>
+          <h2 class="card-text">{{ overdue_firs }}</h2>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card text-white bg-success mb-3">
+        <div class="card-body">
+          <h5 class="card-title">New FIR</h5>
+          <a href="{% url 'officer_fir_create' %}" class="btn btn-light btn-block mt-2">Create</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card mt-4">
+    <div class="card-header">
+      <h5>Recent Cases</h5>
+    </div>
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th>FIR No.</th>
+              <th>Complainant</th>
+              <th>Incident Date</th>
+              <th>Status</th>
+              <th>Deadline</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for fir in recent_firs %}
+            <tr class="{% if fir.investigation_deadline and fir.investigation_deadline < timezone.now %}table-danger{% endif %}">
+              <td>{{ fir.fir_number }}</td>
+              <td>{{ fir.complainant_name }}</td>
+              <td>{{ fir.incident_date|date:"d/m/Y" }}</td>
+              <td><span class="badge badge-{{ fir.get_status_class }}">{{ fir.get_status_display }}</span></td>
+              <td>
+                {% if fir.investigation_deadline %}
+                  {{ fir.investigation_deadline|date:"d/m/Y" }}
+                  {% if fir.investigation_deadline < timezone.now %}
+                    <span class="badge badge-danger">Overdue</span>
+                  {% endif %}
+                {% else %}
+                  -
+                {% endif %}
+              </td>
+              <td>
+                <a href="{% url 'officer_fir_detail' pk=fir.pk %}" class="btn btn-sm btn-info">View</a>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

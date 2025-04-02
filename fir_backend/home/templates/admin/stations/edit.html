@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid">
+  <h2 class="mb-4">Edit Station</h2>
+  
+  <div class="card">
+    <div class="card-body">
+      <form method="post">
+        {% csrf_token %}
+        <div class="form-group">
+          <label for="name">Station Name</label>
+          <input type="text" class="form-control" id="name" name="name" value="{{ station.name }}" required>
+        </div>
+        <div class="form-group">
+          <label for="location">Location</label>
+          <input type="text" class="form-control" id="location" name="location" value="{{ station.location }}" required>
+        </div>
+        <div class="form-group">
+          <label for="contact_number">Contact Number</label>
+          <input type="text" class="form-control" id="contact_number" name="contact_number" value="{{ station.contact_number }}" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Update Station</button>
+        <a href="{% url 'station_list' %}" class="btn btn-secondary">Cancel</a>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

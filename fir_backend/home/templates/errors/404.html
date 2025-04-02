@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container text-center mt-5">
+  <h1 class="display-1 text-danger">404</h1>
+  <h2>Page Not Found</h2>
+  <p class="lead">The page you're looking for doesn't exist.</p>
+  <a href="{% if is_admin %}{% url 'admin_dashboard' %}{% else %}{% url 'officer_dashboard' %}{% endif %}" class="btn btn-primary">Return to Dashboard</a>
+</div>
+{% endblock %}

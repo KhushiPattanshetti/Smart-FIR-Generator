@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid">
+  <h2 class="mb-4">System Analytics</h2>
+  
+  <div class="row">
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-header">
+          <h5>Station Performance</h5>
+        </div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Station</th>
+                  <th>Total FIRs</th>
+                  <th>Pending</th>
+                  <th>Overdue</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for station in stations %}
+                <tr>
+                  <td>{{ station.name }}</td>
+                  <td>{{ station.total_firs }}</td>
+                  <td>{{ station.pending_firs }}</td>
+                  <td>{{ station.overdue_firs }}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-header">
+          <h5>Officer Performance</h5>
+        </div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Officer</th>
+                  <th>Case Load</th>
+                  <th>Closed Cases</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for officer in officers %}
+                <tr>
+                  <td>{{ officer.username }}</td>
+                  <td>{{ officer.case_load }}</td>
+                  <td>{{ officer.closed_cases }}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

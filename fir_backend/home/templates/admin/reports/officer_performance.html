@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Officer Performance Report</h2>
+    <div>
+      <a href="?format=pdf" class="btn btn-danger mr-2">Download PDF</a>
+      <a href="?format=csv" class="btn btn-success">Download CSV</a>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="table table-bordered">
+          <thead class="thead-dark">
+            <tr>
+              <th>Officer</th>
+              <th>Station</th>
+              <th>Total FIRs</th>
+              <th>Closed FIRs</th>
+              <th>Completion Rate</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for officer in data %}
+            <tr>
+              <td>{{ officer.username }}</td>
+              <td>{{ officer.station.name if officer.station else '-' }}</td>
+              <td>{{ officer.total_firs }}</td>
+              <td>{{ officer.closed_firs }}</td>
+              <td>
+                {% if officer.total_firs > 0 %}
+                {{ officer.closed_firs|floatformat:2 }}%
+                {% else %}
+                N/A
+                {% endif %}
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

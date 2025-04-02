@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>My FIR Cases</h2>
+    <a href="{% url 'officer_fir_create' %}" class="btn btn-primary">Register New FIR</a>
+  </div>
+
+  <div class="card mb-4">
+    <div class="card-header">
+      <h5>Filter Cases</h5>
+    </div>
+    <div class="card-body">
+      <form method="get">
+        <div class="form-row">
+          <div class="form-group col-md-4">
+            <label for="status">Status</label>
+            <select class="form-control" id="status" name="status">
+              <option value="">All Statuses</option>
+              {% for value, label in status_choices %}
+              <option value="{{ value }}" {% if current_filter == value %}selected{% endif %}>{{ label }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="form-group col-md-4 d-flex align-items-end">
+            <button type="submit" class="btn btn-primary">Apply Filter</button>
+            <a href="{% url 'officer_fir_list' %}" class="btn btn-secondary ml-2">Reset</a>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th>FIR No.</th>
+              <th>Complainant</th>
+              <th>Incident Date</th>
+              <th>Status</th>
+              <th>Deadline</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for fir in firs %}
+            <tr class="{% if fir.investigation_deadline and fir.investigation_deadline < timezone.now %}table-danger{% endif %}">
+              <td>{{ fir.fir_number }}</td>
+              <td>{{ fir.complainant_name }}</td>
+              <td>{{ fir.incident_date|date:"d/m/Y" }}</td>
+              <td><span class="badge badge-{{ fir.get_status_class }}">{{ fir.get_status_display }}</span></td>
+              <td>
+                {% if fir.investigation_deadline %}
+                  {{ fir.investigation_deadline|date:"d/m/Y" }}
+                  {% if fir.investigation_deadline < timezone.now %}
+                    <span class="badge badge-danger">Overdue</span>
+                  {% endif %}
+                {% else %}
+                  -
+                {% endif %}
+              </td>
+              <td>
+                <a href="{% url 'officer_fir_detail' pk=fir.pk %}" class="btn btn-sm btn-info">View</a>
+                {% if fir.status == 'draft' %}
+                <a href="{% url 'officer_fir_update' pk=fir.pk %}" class="btn btn-sm btn-warning">Edit</a>
+                {% endif %}
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Legal Suggestions for FIR: {{ fir.fir_number }}</h2>
+    <a href="{% url 'generate_legal_suggestions' fir_pk=fir.pk %}" class="btn btn-warning">Regenerate Suggestions</a>
+  </div>
+
+  <div class="card">
+    <div class="card-body">
+      {% if fir.legal_suggestions.all %}
+      <div class="table-responsive">
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th>IPC Section</th>
+              <th>CRPC Section</th>
+              <th>Act</th>
+              <th>Confidence</th>
+              <th>Description</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for suggestion in fir.legal_suggestions.all %}
+            <tr>
+              <td>{{ suggestion.ipc_section }}</td>
+              <td>{{ suggestion.crpc_section|default:"-" }}</td>
+              <td>{{ suggestion.act_name }}</td>
+              <td>
+                <div class="progress" style="height: 20px;">
+                  <div class="progress-bar bg-{% if suggestion.confidence_score > 0.7 %}success{% elif suggestion.confidence_score > 0.4 %}warning{% else %}danger{% endif %}" 
+                       role="progressbar" 
+                       style="width: {{ suggestion.confidence_score|floatformat:2 }}%" 
+                       aria-valuenow="{{ suggestion.confidence_score }}" 
+                       aria-valuemin="0" 
+                       aria-valuemax="100">
+                    {{ suggestion.confidence_score|floatformat:2 }}%
+                  </div>
+                </div>
+              </td>
+              <td>{{ suggestion.description }}</td>
+              <td>
+                <button class="btn btn-sm btn-info" data-toggle="modal" data-target="#editSuggestionModal{{ suggestion.id }}">Edit</button>
+              </td>
+            </tr>
+            
+            <!-- Edit Modal -->
+            <div class="modal fade" id="editSuggestionModal{{ suggestion.id }}" tabindex="-1" role="dialog" aria-labelledby="editSuggestionModalLabel" aria-hidden="true">
+              <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title" id="editSuggestionModalLabel">Edit Legal Suggestion</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                      <span aria-hidden="true">&times;</span>
+                    </button>
+                  </div>
+                  <form method="post" action="{% url 'officer_fir_detail' pk=fir.pk %}">
+                    {% csrf_token %}
+                    <div class="modal-body">
+                      <input type="hidden" name="suggestion_id" value="{{ suggestion.id }}">
+                      <div class="form-group">
+                        <label for="ipc_section">IPC Section</label>
+                        <input type="text" class="form-control" id="ipc_section" name="ipc_section" value="{{ suggestion.ipc_section }}" required>
+                      </div>
+                      <div class="form-group">
+                        <label for="crpc_section">CRPC Section</label>
+                        <input type="text" class="form-control" id="crpc_section" name="crpc_section" value="{{ suggestion.crpc_section|default:'' }}">
+                      </div>
+                      <div class="form-group">
+                        <label for="act_name">Act Name</label>
+                        <input type="text" class="form-control" id="act_name" name="act_name" value="{{ suggestion.act_name }}" required>
+                      </div>
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                      <button type="submit" class="btn btn-primary">Save changes</button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <div class="alert alert-info">
+        No legal suggestions available. 
+        <a href="{% url 'generate_legal_suggestions' fir_pk=fir.pk %}" class="alert-link">Generate suggestions now</a>.
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

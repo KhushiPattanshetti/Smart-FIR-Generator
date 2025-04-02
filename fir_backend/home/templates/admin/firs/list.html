@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid">
+  <h2 class="mb-4">FIR Management</h2>
+  
+  <div class="card mb-4">
+    <div class="card-header">
+      <h5>Filter FIRs</h5>
+    </div>
+    <div class="card-body">
+      <form method="get">
+        <div class="form-row">
+          <div class="form-group col-md-3">
+            <label for="status">Status</label>
+            <select class="form-control" id="status" name="status">
+              <option value="">All Statuses</option>
+              {% for value, label in status_choices %}
+              <option value="{{ value }}" {% if current_filters.status == value %}selected{% endif %}>{{ label }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="form-group col-md-3">
+            <label for="station">Station</label>
+            <select class="form-control" id="station" name="station">
+              <option value="">All Stations</option>
+              {% for station in stations %}
+              <option value="{{ station.pk }}" {% if current_filters.station == station.pk|stringformat:"s" %}selected{% endif %}>{{ station.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="form-group col-md-3">
+            <label for="officer">Officer</label>
+            <select class="form-control" id="officer" name="officer">
+              <option value="">All Officers</option>
+              {% for officer in officers %}
+              <option value="{{ officer.pk }}" {% if current_filters.officer == officer.pk|stringformat:"s" %}selected{% endif %}>{{ officer.username }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="form-group col-md-3 d-flex align-items-end">
+            <button type="submit" class="btn btn-primary">Apply Filters</button>
+            <a href="{% url 'admin_fir_list' %}" class="btn btn-secondary ml-2">Reset</a>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th>FIR No.</th>
+              <th>Complainant</th>
+              <th>Incident Date</th>
+              <th>Station</th>
+              <th>Officer</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for fir in firs %}
+            <tr>
+              <td>{{ fir.fir_number }}</td>
+              <td>{{ fir.complainant_name }}</td>
+              <td>{{ fir.incident_date|date:"d/m/Y" }}</td>
+              <td>{{ fir.station.name }}</td>
+              <td>{{ fir.police_officer.username }}</td>
+              <td><span class="badge badge-{{ fir.get_status_class }}">{{ fir.get_status_display }}</span></td>
+              <td>
+                <a href="{% url 'admin_fir_detail' pk=fir.pk %}" class="btn btn-sm btn-info">View</a>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
