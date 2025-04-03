@@ -4,12 +4,38 @@
 <div class="container-fluid">
   <h2 class="mb-4">Admin Dashboard</h2>
   
+  <!-- Quick Actions Section -->
+  <div class="row mb-4">
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-header bg-primary text-white">
+          <h5>Quick Actions</h5>
+        </div>
+        <div class="card-body">
+          <div class="d-flex justify-content-between">
+            <a href="{% url 'station_create' %}" class="btn btn-success">
+              <i class="bi bi-building-add"></i> Register New Station
+            </a>
+            <a href="{% url 'user_create' %}" class="btn btn-info">
+              <i class="bi bi-person-plus"></i> Register New Officer
+            </a>
+            <a href="{% url 'admin_fir_list' %}" class="btn btn-warning">
+              <i class="bi bi-file-earmark-text"></i> View All FIRs
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stats Cards -->
   <div class="row">
     <div class="col-md-4">
       <div class="card text-white bg-primary mb-3">
         <div class="card-body">
           <h5 class="card-title">Total Stations</h5>
           <h2 class="card-text">{{ total_stations }}</h2>
+          <a href="{% url 'station_list' %}" class="text-white">View all stations <i class="bi bi-arrow-right"></i></a>
         </div>
       </div>
     </div>
@@ -18,6 +44,7 @@
         <div class="card-body">
           <h5 class="card-title">Total Officers</h5>
           <h2 class="card-text">{{ total_officers }}</h2>
+          <a href="{% url 'user_list' %}" class="text-white">Manage officers <i class="bi bi-arrow-right"></i></a>
         </div>
       </div>
     </div>
@@ -26,14 +53,64 @@
         <div class="card-body">
           <h5 class="card-title">Total FIRs</h5>
           <h2 class="card-text">{{ total_firs }}</h2>
+          <a href="{% url 'admin_fir_list' %}" class="text-white">View all FIRs <i class="bi bi-arrow-right"></i></a>
         </div>
       </div>
     </div>
   </div>
 
+  <!-- Recent Activity Section -->
+  <div class="row mt-4">
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-header">
+          <h5>Recent Stations Added</h5>
+        </div>
+        <div class="card-body">
+          <ul class="list-group">
+            {% for station in recent_stations %}
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              {{ station.name }}
+              <span class="badge bg-primary rounded-pill">{{ station.location }}</span>
+            </li>
+            {% empty %}
+            <li class="list-group-item">No stations added recently</li>
+            {% endfor %}
+          </ul>
+          <a href="{% url 'station_list' %}" class="btn btn-sm btn-outline-primary mt-3">View All Stations</a>
+        </div>
+      </div>
+    </div>
+    
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-header">
+          <h5>Recent Officers Registered</h5>
+        </div>
+        <div class="card-body">
+          <ul class="list-group">
+            {% for officer in recent_officers %}
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              {{ officer.username }}
+              <span class="badge bg-info rounded-pill">
+                {% if officer.station %}{{ officer.station.name }}{% else %}Unassigned{% endif %}
+              </span>
+            </li>
+            {% empty %}
+            <li class="list-group-item">No officers registered recently</li>
+            {% endfor %}
+          </ul>
+          <a href="{% url 'user_list' %}" class="btn btn-sm btn-outline-info mt-3">View All Officers</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent FIRs Section -->
   <div class="card mt-4">
-    <div class="card-header">
-      <h5>Recent FIRs</h5>
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <h5 class="mb-0">Recent FIRs</h5>
+      <a href="{% url 'admin_fir_list' %}" class="btn btn-sm btn-primary">View All</a>
     </div>
     <div class="card-body">
       <div class="table-responsive">
@@ -43,6 +120,7 @@
               <th>FIR No.</th>
               <th>Complainant</th>
               <th>Incident Date</th>
+              <th>Station</th>
               <th>Status</th>
               <th>Actions</th>
             </tr>
@@ -53,9 +131,11 @@
               <td>{{ fir.fir_number }}</td>
               <td>{{ fir.complainant_name }}</td>
               <td>{{ fir.incident_date|date:"d/m/Y" }}</td>
+              <td>{{ fir.station.name }}</td>
               <td><span class="badge badge-{{ fir.get_status_class }}">{{ fir.get_status_display }}</span></td>
               <td>
                 <a href="{% url 'admin_fir_detail' pk=fir.pk %}" class="btn btn-sm btn-info">View</a>
+                <a href="{% url 'admin_fir_detail' pk=fir.pk %}" class="btn btn-sm btn-warning">Manage</a>
               </td>
             </tr>
             {% endfor %}

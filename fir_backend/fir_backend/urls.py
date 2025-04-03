@@ -5,6 +5,9 @@ urlpatterns = [
     # Authentication URLs
     path('login/', views.login_view, name='login'),
     path('logout/', views.logout_view, name='logout'),
+    path('register/', views.register_view, name='register'),
+    path('register/admin/', views.register_admin_view, name='register_admin'),
+    path('forgot-password/', views.forgot_password, name='forgot_password'),
     
     # Admin URLs
     path('admin/dashboard/', views.admin_dashboard, name='admin_dashboard'),
@@ -37,27 +40,14 @@ urlpatterns = [
     path('officer/firs/<int:pk>/', views.officer_fir_detail_view, name='officer_fir_detail'),
     path('officer/firs/<int:pk>/update/', views.officer_fir_update_view, name='officer_fir_update'),
     
-    # Team Management
-    path('officer/firs/<int:fir_pk>/team/', views.assign_team_view, name='assign_team'),
-    
-    # Evidence Management
-    path('officer/firs/<int:fir_pk>/evidence/', views.manage_evidence_view, name='manage_evidence'),
-    path('officer/firs/<int:fir_pk>/evidence/upload/', views.upload_evidence_view, name='upload_evidence'),
-    path('officer/firs/<int:fir_pk>/transcribe/', views.transcribe_audio_view, name='transcribe_audio'),
-    
     # Legal Suggestions
-    path('officer/firs/<int:fir_pk>/legal-suggestions/', 
+   path('officer/firs/<int:pk>/legal-suggestions/', 
          views.generate_legal_suggestions_view, name='generate_legal_suggestions'),
     
-    # Witness Management
-    path('officer/firs/<int:fir_pk>/witnesses/', views.manage_witnesses_view, name='manage_witnesses'),
-    
-    # Court Hearings
-    path('officer/firs/<int:fir_pk>/hearings/', views.court_hearings_view, name='court_hearings'),
-    
-    # Charge Sheet
-    path('officer/firs/<int:fir_pk>/charge-sheet/', views.generate_charge_sheet, name='generate_charge_sheet'),
-    
+    # Also update the charge sheet URL for consistency:
+    path('officer/firs/<int:pk>/charge-sheet/', 
+         views.generate_charge_sheet, name='generate_charge_sheet'),
+
     # Notifications
     path('notifications/', views.notifications_view, name='notifications'),
     path('notifications/<int:notification_id>/mark-read/', 
