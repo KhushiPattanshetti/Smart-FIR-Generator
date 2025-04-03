@@ -1,42 +1,139 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="container-fluid">
-  <h2 class="mb-4">Create New User</h2>
-  
-  <div class="card">
+<div class="container-fluid py-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="mb-0" style="color: #0a1f44; font-weight: 600;">
+      <i class="bi bi-person-plus me-2"></i>Create New User
+    </h2>
+    <a href="{% url 'user_list' %}" class="btn py-2 px-3" style="background-color: #f8f5f0; color: #0a1f44; border: 1px solid #dee2e6;">
+      <i class="bi bi-arrow-left me-1"></i> Back to Users
+    </a>
+  </div>
+
+  <div class="card border-0 shadow-sm" style="border-radius: 12px;">
+    <div class="card-header py-3" style="background-color: #0a1f44; color: white; border-radius: 12px 12px 0 0 !important;">
+      <div class="d-flex align-items-center">
+        <i class="bi bi-person-lines-fill me-2 fs-4"></i>
+        <h5 class="mb-0" style="font-weight: 500;">User Registration Form</h5>
+      </div>
+    </div>
     <div class="card-body">
       <form method="post">
         {% csrf_token %}
-        <div class="form-group">
-          <label for="username">Username</label>
-          <input type="text" class="form-control" id="username" name="username" required>
+        
+        <div class="row g-3 mb-4">
+          <div class="col-md-6">
+            <label for="username" class="form-label fw-medium" style="color: #0a1f44;">
+              <i class="bi bi-person-vcard me-1" style="color: #5e0b15;"></i> Username <span class="text-danger">*</span>
+            </label>
+            <div class="input-group">
+              <span class="input-group-text" style="background-color: #f8f5f0; color: #0a1f44;"><i class="bi bi-person"></i></span>
+              <input type="text" class="form-control" id="username" name="username" placeholder="Enter username" required style="border-left: 0;">
+            </div>
+          </div>
+          <div class="col-md-6">
+            <label for="password" class="form-label fw-medium" style="color: #0a1f44;">
+              <i class="bi bi-key me-1" style="color: #5e0b15;"></i> Password <span class="text-danger">*</span>
+            </label>
+            <div class="input-group">
+              <span class="input-group-text" style="background-color: #f8f5f0; color: #0a1f44;"><i class="bi bi-lock"></i></span>
+              <input type="password" class="form-control" id="password" name="password" placeholder="Enter password" required style="border-left: 0;">
+            </div>
+          </div>
         </div>
-        <div class="form-group">
-          <label for="password">Password</label>
-          <input type="password" class="form-control" id="password" name="password" required>
+        
+        <div class="row g-3 mb-4">
+          <div class="col-md-6">
+            <label for="role" class="form-label fw-medium" style="color: #0a1f44;">
+              <i class="bi bi-person-badge me-1" style="color: #5e0b15;"></i> Role <span class="text-danger">*</span>
+            </label>
+            <select class="form-select" id="role" name="role" required>
+              <option value="">Select Role</option>
+              <option value="admin">Admin</option>
+              <option value="police_officer">Police Officer</option>
+            </select>
+          </div>
+          <div class="col-md-6" id="stationField">
+            <label for="station" class="form-label fw-medium" style="color: #0a1f44;">
+              <i class="bi bi-building me-1" style="color: #5e0b15;"></i> Police Station
+            </label>
+            <select class="form-select" id="station" name="station">
+              <option value="">Select Station</option>
+              {% for station in stations %}
+              <option value="{{ station.pk }}">{{ station.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
         </div>
-        <div class="form-group">
-          <label for="role">Role</label>
-          <select class="form-control" id="role" name="role" required>
-            <option value="">Select Role</option>
-            <option value="admin">Admin</option>
-            <option value="police_officer">Police Officer</option>
-          </select>
+        
+        <div class="card mb-4" style="background-color: #f8f5f0; border: none; border-radius: 8px;">
+          <div class="card-body">
+            <div class="d-flex align-items-center">
+              <i class="bi bi-info-circle me-2 fs-4" style="color: #5e0b15;"></i>
+              <div>
+                <p class="mb-1 fw-medium" style="color: #0a1f44;">Important Information</p>
+                <small style="color: #6c757d;">
+                  Admin users have full system access. Police Officers can only access assigned cases.
+                  Passwords must be at least 8 characters long.
+                </small>
+              </div>
+            </div>
+          </div>
         </div>
-        <div class="form-group">
-          <label for="station">Station (for officers)</label>
-          <select class="form-control" id="station" name="station">
-            <option value="">Select Station</option>
-            {% for station in stations %}
-            <option value="{{ station.pk }}">{{ station.name }}</option>
-            {% endfor %}
-          </select>
+        
+        <div class="d-flex gap-2">
+          <button type="submit" class="btn py-2 px-4" style="background: linear-gradient(135deg, #0a1f44 0%, #5e0b15 100%); color: white; border-radius: 8px; font-weight: 500;">
+            <i class="bi bi-save me-1"></i> Create User
+          </button>
+          <a href="{% url 'user_list' %}" class="btn py-2 px-4" style="background-color: #f8f5f0; color: #0a1f44; border-radius: 8px; font-weight: 500; border: 1px solid #dee2e6;">
+            <i class="bi bi-x-circle me-1"></i> Cancel
+          </a>
         </div>
-        <button type="submit" class="btn btn-primary">Create User</button>
-        <a href="{% url 'user_list' %}" class="btn btn-secondary">Cancel</a>
       </form>
     </div>
   </div>
 </div>
+
+<script>
+  // Show/hide station field based on role selection
+  document.getElementById('role').addEventListener('change', function() {
+    const stationField = document.getElementById('stationField');
+    if (this.value === 'police_officer') {
+      stationField.style.display = 'block';
+      document.getElementById('station').required = true;
+    } else {
+      stationField.style.display = 'block';
+      document.getElementById('station').required = false;
+    }
+  });
+</script>
+
+<style>
+  .form-control, .form-select {
+    border: 1px solid #dee2e6;
+    border-radius: 0 8px 8px 0 !important;
+    padding: 10px 15px;
+    transition: all 0.3s;
+  }
+  
+  .form-control:focus, .form-select:focus {
+    border-color: #0a1f44;
+    box-shadow: 0 0 0 0.25rem rgba(10, 31, 68, 0.1);
+  }
+  
+  .input-group-text {
+    border-radius: 8px 0 0 8px !important;
+    border-right: 0;
+  }
+  
+  .card {
+    transition: transform 0.3s, box-shadow 0.3s;
+  }
+  
+  .card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(10, 31, 68, 0.15) !important;
+  }
+</style>
 {% endblock %}

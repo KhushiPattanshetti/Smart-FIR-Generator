@@ -1,33 +1,112 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="container-fluid">
+<div class="container-fluid py-4">
   <div class="d-flex justify-content-between align-items-center mb-4">
-    <h2>Edit Station</h2>
+    <h2 class="mb-0" style="color: #0a1f44; font-weight: 600;">
+      <i class="bi bi-building-gear me-2"></i>Edit Police Station
+    </h2>
+    <a href="{% url 'station_list' %}" class="btn py-2 px-3" style="background-color: #f8f5f0; color: #0a1f44; border: 1px solid #dee2e6;">
+      <i class="bi bi-arrow-left me-1"></i> Back to Stations
+    </a>
   </div>
-  
-  <div class="card">
+
+  <div class="card border-0 shadow-sm" style="border-radius: 12px;">
+    <div class="card-header py-3" style="background-color: #0a1f44; color: white; border-radius: 12px 12px 0 0 !important;">
+      <div class="d-flex align-items-center">
+        <i class="bi bi-house-gear me-2 fs-4"></i>
+        <h5 class="mb-0" style="font-weight: 500;">Station Information</h5>
+      </div>
+    </div>
     <div class="card-body">
       <form method="post">
         {% csrf_token %}
-        <div class="form-group">
-          <label for="name">Station Name</label>
-          <input type="text" class="form-control" id="name" name="name" value="{{ station.name }}" required>
+        
+        <div class="row g-3 mb-4">
+          <div class="col-md-6">
+            <label for="name" class="form-label fw-medium" style="color: #0a1f44;">
+              <i class="bi bi-building me-1" style="color: #5e0b15;"></i> Station Name <span class="text-danger">*</span>
+            </label>
+            <div class="input-group">
+              <span class="input-group-text" style="background-color: #f8f5f0; color: #0a1f44;"><i class="bi bi-pencil"></i></span>
+              <input type="text" class="form-control" id="name" name="name" value="{{ station.name }}" required style="border-left: 0;">
+            </div>
+          </div>
+          <div class="col-md-6">
+            <label for="location" class="form-label fw-medium" style="color: #0a1f44;">
+              <i class="bi bi-geo-alt me-1" style="color: #5e0b15;"></i> Location <span class="text-danger">*</span>
+            </label>
+            <div class="input-group">
+              <span class="input-group-text" style="background-color: #f8f5f0; color: #0a1f44;"><i class="bi bi-map"></i></span>
+              <input type="text" class="form-control" id="location" name="location" value="{{ station.location }}" required style="border-left: 0;">
+            </div>
+          </div>
         </div>
-        <div class="form-group">
-          <label for="location">Location</label>
-          <input type="text" class="form-control" id="location" name="location" value="{{ station.location }}" required>
+        
+        <div class="mb-4">
+          <label for="contact_number" class="form-label fw-medium" style="color: #0a1f44;">
+            <i class="bi bi-telephone me-1" style="color: #5e0b15;"></i> Contact Number <span class="text-danger">*</span>
+          </label>
+          <div class="input-group">
+            <span class="input-group-text" style="background-color: #f8f5f0; color: #0a1f44;">+91</span>
+            <input type="text" class="form-control" id="contact_number" name="contact_number" value="{{ station.contact_number }}" required>
+          </div>
+          <div class="form-text" style="color: #6c757d;">Primary contact number for this station</div>
         </div>
-        <div class="form-group">
-          <label for="contact_number">Contact Number</label>
-          <input type="text" class="form-control" id="contact_number" name="contact_number" value="{{ station.contact_number }}" required>
+        
+        <div class="card mb-4" style="background-color: #f8f5f0; border: none; border-radius: 8px;">
+          <div class="card-body">
+            <div class="d-flex align-items-center">
+              <i class="bi bi-info-circle me-2 fs-4" style="color: #5e0b15;"></i>
+              <div>
+                <p class="mb-1 fw-medium" style="color: #0a1f44;">Update Information</p>
+                <small style="color: #6c757d;">
+                  Changes made here will reflect across the system immediately. 
+                  Ensure contact information is always up-to-date.
+                </small>
+              </div>
+            </div>
+          </div>
         </div>
-        <div class="form-group mt-4">
-          <button type="submit" class="btn btn-primary">Update Station</button>
-          <a href="{% url 'station_list' %}" class="btn btn-secondary">Cancel</a>
+        
+        <div class="d-flex gap-2">
+          <button type="submit" class="btn py-2 px-4" style="background: linear-gradient(135deg, #0a1f44 0%, #5e0b15 100%); color: white; border-radius: 8px; font-weight: 500;">
+            <i class="bi bi-save me-1"></i> Update Station
+          </button>
+          <a href="{% url 'station_list' %}" class="btn py-2 px-4" style="background-color: #f8f5f0; color: #0a1f44; border-radius: 8px; font-weight: 500; border: 1px solid #dee2e6;">
+            <i class="bi bi-x-circle me-1"></i> Cancel
+          </a>
         </div>
       </form>
     </div>
   </div>
 </div>
+
+<style>
+  .form-control, .form-select {
+    border: 1px solid #dee2e6;
+    border-radius: 0 8px 8px 0 !important;
+    padding: 10px 15px;
+    transition: all 0.3s;
+  }
+  
+  .form-control:focus, .form-select:focus {
+    border-color: #0a1f44;
+    box-shadow: 0 0 0 0.25rem rgba(10, 31, 68, 0.1);
+  }
+  
+  .input-group-text {
+    border-radius: 8px 0 0 8px !important;
+    border-right: 0;
+  }
+  
+  .card {
+    transition: transform 0.3s, box-shadow 0.3s;
+  }
+  
+  .card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(10, 31, 68, 0.15) !important;
+  }
+</style>
 {% endblock %}

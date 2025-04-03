@@ -1,26 +1,69 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="container-fluid">
-  <h2 class="mb-4">Admin Dashboard</h2>
-  
-  <!-- Quick Actions Section -->
-  <div class="row mb-4">
-    <div class="col-md-6">
-      <div class="card">
-        <div class="card-header bg-primary text-white">
-          <h5>Quick Actions</h5>
+<div class="container-fluid py-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="mb-0" style="color: #0a1f44; font-weight: 600;">
+      <i class="bi bi-speedometer2 me-2"></i>Admin Dashboard
+    </h2>
+    <div class="d-flex gap-2">
+      <a href="{% url 'station_create' %}" class="btn py-2 px-3" style="background: linear-gradient(135deg, #0a1f44 0%, #5e0b15 100%); color: white;">
+        <i class="bi bi-building-add me-1"></i> New Station
+      </a>
+      <a href="{% url 'user_create' %}" class="btn py-2 px-3" style="background-color: #5e0b15; color: white;">
+        <i class="bi bi-person-plus me-1"></i> New Officer
+      </a>
+      <a href="{% url 'admin_fir_list' %}" class="btn py-2 px-3" style="background-color: #0a1f44; color: white;">
+        <i class="bi bi-file-earmark-text me-1"></i> All FIRs
+      </a>
+    </div>
+  </div>
+
+  <!-- Stats Cards Section -->
+  <div class="row g-3 mb-4">
+    <div class="col-md-4">
+      <div class="card border-0 shadow-sm h-100" style="border-left: 4px solid #0a1f44;">
+        <div class="card-body d-flex align-items-center">
+          <div class="rounded-circle p-3 me-3" style="background-color: rgba(10, 31, 68, 0.1);">
+            <i class="bi bi-building" style="color: #0a1f44; font-size: 1.5rem;"></i>
+          </div>
+          <div>
+            <h6 class="mb-1" style="color: #6c757d;">Total Stations</h6>
+            <h3 class="mb-0" style="color: #0a1f44;">{{ total_stations }}</h3>
+            <a href="{% url 'station_list' %}" class="small" style="color: #0a1f44;">
+              View all <i class="bi bi-arrow-right"></i>
+            </a>
+          </div>
         </div>
-        <div class="card-body">
-          <div class="d-flex justify-content-between">
-            <a href="{% url 'station_create' %}" class="btn btn-success">
-              <i class="bi bi-building-add"></i> Register New Station
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card border-0 shadow-sm h-100" style="border-left: 4px solid #5e0b15;">
+        <div class="card-body d-flex align-items-center">
+          <div class="rounded-circle p-3 me-3" style="background-color: rgba(94, 11, 21, 0.1);">
+            <i class="bi bi-people" style="color: #5e0b15; font-size: 1.5rem;"></i>
+          </div>
+          <div>
+            <h6 class="mb-1" style="color: #6c757d;">Total Officers</h6>
+            <h3 class="mb-0" style="color: #5e0b15;">{{ total_officers }}</h3>
+            <a href="{% url 'user_list' %}" class="small" style="color: #5e0b15;">
+              Manage <i class="bi bi-arrow-right"></i>
             </a>
-            <a href="{% url 'user_create' %}" class="btn btn-info">
-              <i class="bi bi-person-plus"></i> Register New Officer
-            </a>
-            <a href="{% url 'admin_fir_list' %}" class="btn btn-warning">
-              <i class="bi bi-file-earmark-text"></i> View All FIRs
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card border-0 shadow-sm h-100" style="border-left: 4px solid #d4af37;">
+        <div class="card-body d-flex align-items-center">
+          <div class="rounded-circle p-3 me-3" style="background-color: rgba(212, 175, 55, 0.1);">
+            <i class="bi bi-file-text" style="color: #d4af37; font-size: 1.5rem;"></i>
+          </div>
+          <div>
+            <h6 class="mb-1" style="color: #6c757d;">Total FIRs</h6>
+            <h3 class="mb-0" style="color: #d4af37;">{{ total_firs }}</h3>
+            <a href="{% url 'admin_fir_list' %}" class="small" style="color: #d4af37;">
+              View all <i class="bi bi-arrow-right"></i>
             </a>
           </div>
         </div>
@@ -28,121 +71,108 @@
     </div>
   </div>
 
-  <!-- Stats Cards -->
-  <div class="row">
-    <div class="col-md-4">
-      <div class="card text-white bg-primary mb-3">
-        <div class="card-body">
-          <h5 class="card-title">Total Stations</h5>
-          <h2 class="card-text">{{ total_stations }}</h2>
-          <a href="{% url 'station_list' %}" class="text-white">View all stations <i class="bi bi-arrow-right"></i></a>
+  <!-- Recent Activities Section -->
+  <div class="row g-3">
+    <!-- Recent Stations -->
+   
+    <!-- Recent FIRs -->
+    <div class="col-12 mt-3">
+      <div class="card border-0 shadow-sm">
+        <div class="card-header py-3" style="background-color: #0a1f44; color: white;">
+          <div class="d-flex justify-content-between align-items-center">
+            <h5 class="mb-0" style="font-weight: 500;">
+              <i class="bi bi-file-earmark-text me-2"></i>Recent FIRs
+            </h5>
+            <a href="{% url 'admin_fir_list' %}" class="btn btn-sm" style="background-color: rgba(255, 255, 255, 0.2); color: white;">
+              View All
+            </a>
+          </div>
         </div>
-      </div>
-    </div>
-    <div class="col-md-4">
-      <div class="card text-white bg-success mb-3">
-        <div class="card-body">
-          <h5 class="card-title">Total Officers</h5>
-          <h2 class="card-text">{{ total_officers }}</h2>
-          <a href="{% url 'user_list' %}" class="text-white">Manage officers <i class="bi bi-arrow-right"></i></a>
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table table-hover mb-0">
+              <thead style="background-color: #f8f5f0;">
+                <tr>
+                  <th style="color: #0a1f44;">FIR No.</th>
+                  <th style="color: #0a1f44;">Complainant</th>
+                  <th style="color: #0a1f44;">Incident Date</th>
+                  <th style="color: #0a1f44;">Station</th>
+                  <th class="text-end" style="color: #0a1f44;">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for fir in recent_firs %}
+                <tr>
+                  <td><strong>{{ fir.fir_number }}</strong></td>
+                  <td>{{ fir.complainant_name }}</td>
+                  <td>{{ fir.incident_date|date:"d/m/Y" }}</td>
+                  <td>{{ fir.station.name }}</td>
+                  <td class="text-end">
+                    <a href="{% url 'admin_fir_detail' pk=fir.pk %}" class="btn btn-sm me-1" style="background-color: #f8f5f0; color: #0a1f44;">
+                      <i class="bi bi-eye"></i>
+                    </a>
+                  </td>
+                </tr>
+                {% empty %}
+                <tr>
+                  <td colspan="6" class="text-center py-3 text-muted">
+                    <i class="bi bi-info-circle me-2"></i>No recent FIRs to display
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
         </div>
-      </div>
-    </div>
-    <div class="col-md-4">
-      <div class="card text-white bg-info mb-3">
-        <div class="card-body">
-          <h5 class="card-title">Total FIRs</h5>
-          <h2 class="card-text">{{ total_firs }}</h2>
-          <a href="{% url 'admin_fir_list' %}" class="text-white">View all FIRs <i class="bi bi-arrow-right"></i></a>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Recent Activity Section -->
-  <div class="row mt-4">
-    <div class="col-md-6">
-      <div class="card">
-        <div class="card-header">
-          <h5>Recent Stations Added</h5>
-        </div>
-        <div class="card-body">
-          <ul class="list-group">
-            {% for station in recent_stations %}
-            <li class="list-group-item d-flex justify-content-between align-items-center">
-              {{ station.name }}
-              <span class="badge bg-primary rounded-pill">{{ station.location }}</span>
-            </li>
-            {% empty %}
-            <li class="list-group-item">No stations added recently</li>
-            {% endfor %}
-          </ul>
-          <a href="{% url 'station_list' %}" class="btn btn-sm btn-outline-primary mt-3">View All Stations</a>
-        </div>
-      </div>
-    </div>
-    
-    <div class="col-md-6">
-      <div class="card">
-        <div class="card-header">
-          <h5>Recent Officers Registered</h5>
-        </div>
-        <div class="card-body">
-          <ul class="list-group">
-            {% for officer in recent_officers %}
-            <li class="list-group-item d-flex justify-content-between align-items-center">
-              {{ officer.username }}
-              <span class="badge bg-info rounded-pill">
-                {% if officer.station %}{{ officer.station.name }}{% else %}Unassigned{% endif %}
-              </span>
-            </li>
-            {% empty %}
-            <li class="list-group-item">No officers registered recently</li>
-            {% endfor %}
-          </ul>
-          <a href="{% url 'user_list' %}" class="btn btn-sm btn-outline-info mt-3">View All Officers</a>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Recent FIRs Section -->
-  <div class="card mt-4">
-    <div class="card-header d-flex justify-content-between align-items-center">
-      <h5 class="mb-0">Recent FIRs</h5>
-      <a href="{% url 'admin_fir_list' %}" class="btn btn-sm btn-primary">View All</a>
-    </div>
-    <div class="card-body">
-      <div class="table-responsive">
-        <table class="table table-hover">
-          <thead>
-            <tr>
-              <th>FIR No.</th>
-              <th>Complainant</th>
-              <th>Incident Date</th>
-              <th>Station</th>
-              <th>Status</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for fir in recent_firs %}
-            <tr>
-              <td>{{ fir.fir_number }}</td>
-              <td>{{ fir.complainant_name }}</td>
-              <td>{{ fir.incident_date|date:"d/m/Y" }}</td>
-              <td>{{ fir.station.name }}</td>
-              <td><span class="badge badge-{{ fir.get_status_class }}">{{ fir.get_status_display }}</span></td>
-              <td>
-                <a href="{% url 'admin_fir_detail' pk=fir.pk %}" class="btn btn-sm btn-info">View</a>
-                <a href="{% url 'admin_fir_detail' pk=fir.pk %}" class="btn btn-sm btn-warning">Manage</a>
-              </td>
-            </tr>
-            {% endfor %}
-          </tbody>
-        </table>
       </div>
     </div>
   </div>
 </div>
+
+<style>
+  .badge-status {
+    padding: 6px 10px;
+    border-radius: 20px;
+    font-weight: 500;
+    text-transform: uppercase;
+    font-size: 0.7rem;
+    letter-spacing: 0.5px;
+  }
+  
+  .badge-draft { 
+    background-color: #6c757d; 
+    color: white; 
+  }
+  
+  .badge-submitted { 
+    background-color: #0d6efd; 
+    color: white; 
+  }
+  
+  .badge-under_investigation { 
+    background-color: #fd7e14; 
+    color: white; 
+  }
+  
+  .badge-closed { 
+    background-color: #198754; 
+    color: white; 
+  }
+
+  .card {
+    transition: transform 0.3s ease;
+  }
+
+  .card:hover {
+    transform: translateY(-2px);
+  }
+
+  .list-group-item {
+    transition: background-color 0.2s ease;
+  }
+
+  .list-group-item:hover {
+    background-color: #f8f5f0;
+  }
+</style>
 {% endblock %}

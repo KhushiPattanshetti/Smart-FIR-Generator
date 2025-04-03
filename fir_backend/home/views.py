@@ -18,13 +18,15 @@ from xhtml2pdf import pisa
 from deep_translator import GoogleTranslator
 import joblib
 from .models import User, Station, FIR, LegalSuggestion, Notification
-from .forms import UserRegistrationForm, AdminRegistrationForm
 
 logger = logging.getLogger(__name__)
 
 # ======================
 # MODEL LOADING SYSTEM
 # ======================
+
+def homepage(request):
+    return render(request, 'home.html')
 
 def load_ml_models():
     """Load ML models once at application startup"""
@@ -111,40 +113,6 @@ def login_view(request):
 def logout_view(request):
     logout(request)
     return redirect('login')
-
-def register_view(request):
-    if request.method == 'POST':
-        form = UserRegistrationForm(request.POST)
-        if form.is_valid():
-            user = form.save(commit=False)
-            user.role = 'police_officer'
-            user.set_password(form.cleaned_data['password'])
-            user.save()
-            login(request, user)
-            return redirect('officer_dashboard')
-    else:
-        form = UserRegistrationForm()
-    return render(request, 'auth/register.html', {'form': form})
-
-@login_required
-@user_passes_test(is_admin)
-def register_admin_view(request):
-    if request.method == 'POST':
-        form = AdminRegistrationForm(request.POST)
-        if form.is_valid():
-            user = form.save(commit=False)
-            user.role = 'admin'
-            user.set_password(form.cleaned_data['password'])
-            user.save()
-            messages.success(request, "Admin user created successfully")
-            return redirect('user_list')
-    else:
-        form = AdminRegistrationForm()
-    return render(request, 'auth/register_admin.html', {'form': form})
-
-def forgot_password(request):
-    # TODO: Implement password reset functionality
-    return render(request, 'auth/forgot_password.html')
 
 # ======================
 # ADMIN VIEWS
@@ -297,77 +265,7 @@ def admin_fir_detail_view(request, pk):
     })
 
 # Reports
-@login_required
-@user_passes_test(is_admin)
-def report_generate_view(request):
-    report_type = request.GET.get('type', 'monthly')
-    format = request.GET.get('format', 'html')
-    end_date = timezone.now()
-    start_date = end_date - timedelta(days=30)
-    
-    if report_type == 'monthly':
-        data = FIR.objects.filter(created_at__range=(start_date, end_date)).values(
-            'station__name').annotate(
-            total=Count('id'),
-            draft=Count('id', filter=Q(status='draft')),
-            submitted=Count('id', filter=Q(status='submitted')),
-            investigating=Count('id', filter=Q(status='under_investigation')),
-            closed=Count('id', filter=Q(status='closed'))
-        )
-        template = 'admin/reports/monthly.html'
-    elif report_type == 'officer_performance':
-        data = User.objects.filter(role='police_officer').annotate(
-            total=Count('filed_firs'),
-            closed=Count('filed_firs', filter=Q(filed_firs__status='closed'))
-        )
-        template = 'admin/reports/officer_performance.html'
-    else:
-        return redirect('report_generate')
-    
-    if format == 'pdf':
-        pdf = generate_pdf_report(render_to_string(template, {
-            'data': data, 
-            'start_date': start_date, 
-            'end_date': end_date
-        }))
-        if pdf:
-            response = HttpResponse(pdf, content_type='application/pdf')
-            response['Content-Disposition'] = f'attachment; filename="{report_type}_report.pdf"'
-            return response
-    
-    elif format == 'csv':
-        response = HttpResponse(content_type='text/csv')
-        response['Content-Disposition'] = f'attachment; filename="{report_type}_report.csv"'
-        writer = csv.writer(response)
-        
-        if report_type == 'monthly':
-            writer.writerow(['Station', 'Total', 'Draft', 'Submitted', 'Investigating', 'Closed'])
-            for item in data:
-                writer.writerow([
-                    item['station__name'],
-                    item['total'],
-                    item['draft'],
-                    item['submitted'],
-                    item['investigating'],
-                    item['closed']
-                ])
-        else:
-            writer.writerow(['Officer', 'Total FIRs', 'Closed FIRs'])
-            for officer in data:
-                writer.writerow([officer.username, officer.total, officer.closed])
-        
-        return response
-    
-    return render(request, template, {
-        'data': data,
-        'start_date': start_date,
-        'end_date': end_date,
-        'report_type': report_type
-    })
 
-# ======================
-# OFFICER VIEWS
-# ======================
 
 @login_required
 @user_passes_test(is_police_officer)
@@ -476,81 +374,3 @@ def generate_legal_suggestions_view(request, pk):  # Note the parameter name is 
 
     messages.success(request, "Legal suggestions generated successfully")
     return redirect('officer_fir_detail', pk=fir.pk)
-
-@login_required
-@user_passes_test(is_police_officer)
-def generate_charge_sheet(request, fir_pk):
-    fir = get_object_or_404(FIR, pk=fir_pk)
-    if not can_access_fir(request.user, fir):
-        raise PermissionDenied
-    
-    if fir.status != 'under_investigation':
-        messages.error(request, "Charge sheet can only be generated for cases under investigation")
-        return redirect('officer_fir_detail', pk=fir.pk)
-    
-    context = {
-        'fir': fir,
-        'legal_suggestions': LegalSuggestion.objects.filter(fir=fir),
-        'officer': request.user
-    }
-    
-    if request.GET.get('format') == 'pdf':
-        pdf = generate_pdf_report(render_to_string('officer/firs/charge_sheet_pdf.html', context))
-        if pdf:
-            response = HttpResponse(pdf, content_type='application/pdf')
-            response['Content-Disposition'] = f'attachment; filename="charge_sheet_{fir.fir_number}.pdf"'
-            return response
-    
-    return render(request, 'officer/firs/charge_sheet.html', context)
-
-# ======================
-# NOTIFICATION VIEWS
-# ======================
-
-@login_required
-def notifications_view(request):
-    return render(request, 'notifications/list.html', {
-        'notifications': Notification.objects.filter(
-            user=request.user
-        ).order_by('-created_at')[:50]
-    })
-
-@login_required
-def mark_notification_read_view(request, notification_id):
-    notification = get_object_or_404(Notification, pk=notification_id, user=request.user)
-    notification.read = True
-    notification.save()
-    return redirect(notification.link if notification.link else 'notifications')
-
-# ======================
-# ANALYTICS VIEWS
-# ======================
-
-@login_required
-def dashboard_analytics(request):
-    if is_admin(request.user):
-        return render(request, 'admin/analytics.html', {
-            'stations': Station.objects.annotate(
-                total=Count('firs'),
-                pending=Count('firs', filter=Q(firs__status__in=['submitted', 'under_investigation'])),
-                overdue=Count('firs', filter=Q(
-                    firs__status='under_investigation',
-                    firs__investigation_deadline__lt=timezone.now()
-                ))
-            ),
-            'officers': User.objects.filter(role='police_officer').annotate(
-                case_load=Count('filed_firs', filter=Q(filed_firs__status__in=['submitted', 'under_investigation'])),
-                closed_cases=Count('filed_firs', filter=Q(filed_firs__status='closed'))
-            )
-        })
-    else:
-        return render(request, 'officer/analytics.html', {
-            'firs_by_status': FIR.objects.filter(
-                police_officer=request.user
-            ).values('status').annotate(count=Count('id')),
-            'overdue_firs': FIR.objects.filter(
-                police_officer=request.user,
-                status='under_investigation',
-                investigation_deadline__lt=timezone.now()
-            ).count()
-        })

@@ -1,17 +1,18 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="container-fluid">
+<div class="container-fluid py-4">
   <!-- Messages Display -->
   {% if messages %}
-  <div class="row">
+  <div class="row mb-3">
     <div class="col-12">
       {% for message in messages %}
-      <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible fade show">
-        {{ message }}
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
+      <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible fade show shadow-sm border-0" style="border-radius: 8px;">
+        <div class="d-flex align-items-center">
+          <i class="bi {% if message.tags == 'error' %}bi-exclamation-triangle{% else %}bi-check-circle{% endif %} me-2"></i>
+          <div>{{ message }}</div>
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
       </div>
       {% endfor %}
     </div>
@@ -20,38 +21,69 @@
 
   <!-- FIR Header -->
   <div class="d-flex justify-content-between align-items-center mb-4">
-    <h2>FIR: {{ fir.fir_number }}</h2>
+    <div class="d-flex align-items-center">
+      <div class="me-3 p-3 rounded-3" style="background: linear-gradient(135deg, #0a1f44 0%, #5e0b15 100%); color: white;">
+        <i class="bi bi-file-text fs-2"></i>
+      </div>
+      <div>
+        <h2 class="mb-0" style="color: #0a1f44;">FIR: {{ fir.fir_number }}</h2>
+        <small class="text-muted">Registered on {{ fir.created_at|date:"d M Y" }}</small>
+      </div>
+    </div>
     <div>
-      <span class="badge badge-{{ fir.get_status_class }}">{{ fir.get_status_display }}</span>
+      
       {% if fir.investigation_deadline and fir.investigation_deadline < timezone.now %}
-        <span class="badge badge-danger ml-2">Overdue</span>
+        <span class="badge py-2 px-3 fs-6 ms-2" style="background-color: rgba(139, 38, 53, 0.1); color: #8b2635; border-radius: 6px;">
+          <i class="bi bi-exclamation-triangle me-1"></i> Overdue
+        </span>
       {% endif %}
     </div>
   </div>
 
-  <div class="row">
+  <div class="row g-4">
     <!-- Left Column - Case Details -->
-    <div class="col-md-8">
-      <div class="card mb-4">
-        <div class="card-header bg-primary text-white">
-          <h5 class="mb-0">Case Details</h5>
+    <div class="col-lg-8">
+      <div class="card border-0 shadow-sm mb-4" style="border-radius: 12px;">
+        <div class="card-header py-3" style="background: linear-gradient(135deg, #0a1f44 0%, #5e0b15 100%); color: white; border-radius: 12px 12px 0 0 !important;">
+          <div class="d-flex align-items-center">
+            <i class="bi bi-clipboard-data me-2"></i>
+            <h5 class="mb-0">Case Details</h5>
+          </div>
         </div>
         <div class="card-body">
-          <div class="row">
+          <div class="row g-3">
             <div class="col-md-6">
-              <p><strong>Complainant:</strong> {{ fir.complainant_name }}</p>
-              <p><strong>Contact:</strong> {{ fir.complainant_contact }}</p>
-              <p><strong>Incident Date:</strong> {{ fir.incident_date|date:"d/m/Y" }}</p>
+              <div class="d-flex mb-3">
+                <div style="width: 140px; color: #6c757d;"><strong>Complainant:</strong></div>
+                <div>{{ fir.complainant_name }}</div>
+              </div>
+              <div class="d-flex mb-3">
+                <div style="width: 140px; color: #6c757d;"><strong>Contact:</strong></div>
+                <div>{{ fir.complainant_contact }}</div>
+              </div>
+              <div class="d-flex mb-3">
+                <div style="width: 140px; color: #6c757d;"><strong>Incident Date:</strong></div>
+                <div>{{ fir.incident_date|date:"d M Y" }}</div>
+              </div>
             </div>
             <div class="col-md-6">
-              <p><strong>Location:</strong> {{ fir.incident_location }}</p>
-              <p><strong>Station:</strong> {{ fir.station.name }}</p>
-              <p><strong>Registered On:</strong> {{ fir.created_at|date:"d/m/Y H:i" }}</p>
+              <div class="d-flex mb-3">
+                <div style="width: 140px; color: #6c757d;"><strong>Location:</strong></div>
+                <div>{{ fir.incident_location }}</div>
+              </div>
+              <div class="d-flex mb-3">
+                <div style="width: 140px; color: #6c757d;"><strong>Police Station:</strong></div>
+                <div>{{ fir.station.name }}</div>
+              </div>
+              <div class="d-flex mb-3">
+                <div style="width: 140px; color: #6c757d;"><strong>Registered On:</strong></div>
+                <div>{{ fir.created_at|date:"d M Y H:i" }}</div>
+              </div>
             </div>
           </div>
-          <hr>
-          <p><strong>Description:</strong></p>
-          <div class="bg-light p-3 rounded">
+          <hr class="my-4" style="border-color: rgba(0,0,0,0.05);">
+          <div class="mb-2" style="color: #6c757d;"><strong>Description:</strong></div>
+          <div class="p-3 rounded-3" style="background-color: #f8f5f0; border: 1px solid rgba(0,0,0,0.05);">
             <p class="mb-0">{{ fir.incident_description|linebreaks }}</p>
           </div>
         </div>
@@ -59,53 +91,41 @@
     </div>
 
     <!-- Right Column - Actions and Legal Suggestions -->
-    <div class="col-md-4">
+    <div class="col-lg-4">
       <!-- Case Actions Card -->
-      <div class="card mb-4">
-        <div class="card-header bg-primary text-white">
-          <h5 class="mb-0">Case Actions</h5>
+      <div class="card border-0 shadow-sm mb-4" style="border-radius: 12px;">
+        <div class="card-header py-3" style="background: linear-gradient(135deg, #0a1f44 0%, #5e0b15 100%); color: white; border-radius: 12px 12px 0 0 !important;">
+          <div class="d-flex align-items-center">
+            <i class="bi bi-gear me-2"></i>
+            <h5 class="mb-0">Case Actions</h5>
+          </div>
         </div>
         <div class="card-body">
-          <form method="post" action="{% url 'officer_fir_detail' pk=fir.pk %}">
-            {% csrf_token %}
-            <div class="form-group">
-              <label for="status">Update Status</label>
-              <select class="form-control" id="status" name="status" required>
-                {% for value, label in status_choices %}
-                  {% if value != fir.status %}
-                    <option value="{{ value }}">{{ label }}</option>
-                  {% endif %}
-                {% endfor %}
-              </select>
-            </div>
-            <button type="submit" class="btn btn-primary btn-block">
-              <i class="fas fa-save mr-2"></i>Update Status
-            </button>
-          </form>
           
-          <hr>
-          
-          <div class="d-flex flex-column">
-            <a href="{% url 'generate_legal_suggestions' pk=fir.pk %}" class="btn btn-warning btn-sm mb-2">
-              Generate Legal Suggestions
+          <div class="d-grid">
+            <a href="{% url 'generate_legal_suggestions' pk=fir.pk %}" class="btn py-2" style="background: linear-gradient(135deg, #5e0b15 0%, #8b2635 100%); color: white; border-radius: 8px;">
+              <i class="bi bi-lightning me-2"></i>Generate Legal Suggestions
             </a>
           </div>
         </div>
       </div>
 
       <!-- Legal Suggestions Card -->
-      <div class="card mb-4">
-        <div class="card-header bg-primary text-white">
-          <h5 class="mb-0">Legal Suggestions</h5>
+      <div class="card border-0 shadow-sm mb-4" style="border-radius: 12px;">
+        <div class="card-header py-3" style="background: linear-gradient(135deg, #0a1f44 0%, #5e0b15 100%); color: white; border-radius: 12px 12px 0 0 !important;">
+          <div class="d-flex align-items-center">
+            <i class="bi bi-balance-scale me-2"></i>
+            <h5 class="mb-0">Legal Suggestions</h5>
+          </div>
         </div>
         <div class="card-body">
           {% if fir.legal_suggestions.all %}
-            <div class="list-group">
+            <div class="list-group list-group-flush">
               {% for suggestion in fir.legal_suggestions.all %}
-                <div class="list-group-item">
+                <div class="list-group-item px-0 py-3 border-bottom" style="border-color: rgba(0,0,0,0.05);">
                   <div class="d-flex justify-content-between align-items-center">
-                    <strong class="text-primary">{{ suggestion.ipc_section }}</strong>
-                    <span class="badge badge-pill badge-info">
+                    <strong style="color: #0a1f44;">{{ suggestion.ipc_section }}</strong>
+                    <span class="badge rounded-pill py-1 px-2" style="background-color: rgba(10, 31, 68, 0.1); color: #0a1f44;">
                       {{ suggestion.confidence_score|floatformat:2 }}
                     </span>
                   </div>
@@ -118,11 +138,11 @@
               {% endfor %}
             </div>
           {% else %}
-            <div class="text-center py-3">
-              <i class="fas fa-info-circle fa-2x text-muted mb-2"></i>
-              <p class="text-muted">No legal suggestions generated yet.</p>
-              <a href="{% url 'generate_legal_suggestions' pk=fir.pk %}" class="btn btn-sm btn-outline-primary">
-                Generate Suggestions
+            <div class="text-center py-4">
+              <i class="bi bi-info-circle fs-3 mb-3" style="color: #6c757d;"></i>
+              <p class="mb-3" style="color: #6c757d;">No legal suggestions generated yet.</p>
+              <a href="{% url 'generate_legal_suggestions' pk=fir.pk %}" class="btn btn-sm py-2 px-3" style="background-color: rgba(10, 31, 68, 0.05); color: #0a1f44; border-radius: 6px;">
+                <i class="bi bi-lightning me-1"></i>Generate Suggestions
               </a>
             </div>
           {% endif %}
@@ -132,7 +152,34 @@
   </div>
 </div>
 
-<!-- JavaScript -->
+<style>
+  .card {
+    transition: transform 0.3s, box-shadow 0.3s;
+  }
+  
+  .card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(10, 31, 68, 0.15) !important;
+  }
+  
+  .btn {
+    transition: all 0.3s;
+    font-weight: 500;
+  }
+  
+  .btn:hover {
+    transform: translateY(-1px);
+  }
+  
+  .badge {
+    font-weight: 500;
+  }
+  
+  hr {
+    opacity: 0.5;
+  }
+</style>
+
 <script>
 document.addEventListener('DOMContentLoaded', function() {
   // Status update form submission
@@ -144,59 +191,6 @@ document.addEventListener('DOMContentLoaded', function() {
         e.preventDefault();
         alert('Please select a status');
       }
-    });
-  }
-
-  // Delete note function (if notes exist in your system)
-  window.deleteNote = function(noteId) {
-    if (confirm('Are you sure you want to delete this note?')) {
-      fetch(`/api/notes/${noteId}/`, {
-        method: 'DELETE',
-        headers: {
-          'X-CSRFToken': '{{ csrf_token }}',
-          'Content-Type': 'application/json'
-        }
-      })
-      .then(response => {
-        if (response.ok) {
-          location.reload();
-        } else {
-          alert('Failed to delete note');
-        }
-      })
-      .catch(error => {
-        console.error('Error:', error);
-        alert('An error occurred while deleting the note');
-      });
-    }
-  };
-
-  // Add note form submission (if notes exist in your system)
-  const addNoteForm = document.getElementById('addNoteForm');
-  if (addNoteForm) {
-    addNoteForm.addEventListener('submit', function(e) {
-      e.preventDefault();
-      const formData = new FormData(this);
-      
-      fetch(`/api/firs/{{ fir.pk }}/notes/`, {
-        method: 'POST',
-        body: formData,
-        headers: {
-          'X-CSRFToken': '{{ csrf_token }}'
-        }
-      })
-      .then(response => response.json())
-      .then(data => {
-        if (data.success) {
-          location.reload();
-        } else {
-          alert(data.error || 'Failed to add note');
-        }
-      })
-      .catch(error => {
-        console.error('Error:', error);
-        alert('An error occurred while adding the note');
-      });
     });
   }
 });

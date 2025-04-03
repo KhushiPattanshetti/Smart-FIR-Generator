@@ -1,37 +1,506 @@
-{% extends "base.html" %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nyaya Setu - Police FIR System</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.0/font/bootstrap-icons.css">
+  <style>
+    :root {
+      --primary-color: #0a1f44; /* Navy Blue */
+      --primary-dark: #5e0b15; /* Maroon */
+      --primary-light: #f8f5f0; /* Ivory */
+      --secondary-color: #6c757d;
+      --accent-color: #8b2635; /* Darker Maroon */
+      --light-bg: #f8f5f0; /* Ivory */
+    }
+    
+    body {
+      min-height: 100vh;
+      background-color: var(--light-bg);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: #212529;
+      padding: 20px 0;
+      font-family: 'Segoe UI', 'Noto Sans', Tahoma, Geneva, Verdana, sans-serif;
+      background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100" opacity="0.05"><path d="M30,10 L70,10 L90,50 L70,90 L30,90 L10,50 Z" fill="%230a1f44"/></svg>');
+      background-size: 100px;
+    }
+    
+    .welcome-container {
+      width: 100%;
+      max-width: 1200px;
+      padding: 20px;
+    }
+    
+    .main-card {
+      border: none;
+      border-radius: 20px;
+      box-shadow: 0 15px 35px rgba(10, 31, 68, 0.15);
+      overflow: hidden;
+      transition: transform 0.3s, box-shadow 0.3s;
+      background-color: white;
+    }
+    
+    .main-card:hover {
+      box-shadow: 0 20px 40px rgba(10, 31, 68, 0.2);
+    }
+    
+    .system-logo {
+      font-size: 3.5rem;
+      background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 15px;
+      filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.1));
+    }
+    
+    .login-section {
+      padding: 40px;
+      background-color: white;
+      color: #212529;
+      position: relative;
+      z-index: 1;
+      border-right: 1px solid rgba(0, 0, 0, 0.05);
+    }
+    
+    .login-section::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      background: radial-gradient(circle at top right, rgba(10, 31, 68, 0.05), transparent 60%);
+      z-index: -1;
+    }
+    
+    .feature-section {
+      background-color: white;
+      padding: 40px;
+      background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewBox="0 0 60 60" opacity="0.03"><path d="M30,5 L55,20 L55,40 L30,55 L5,40 L5,20 Z" fill="%235e0b15"/></svg>');
+      background-size: 60px;
+    }
+    
+    .feature-card {
+      height: 100%;
+      transition: all 0.3s ease;
+      border: none;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 5px 15px rgba(10, 31, 68, 0.08);
+      position: relative;
+      background-color: white;
+    }
+    
+    .feature-card::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      height: 100%;
+      width: 4px;
+      background: linear-gradient(to bottom, var(--primary-color), var(--primary-dark));
+      transition: width 0.3s ease;
+    }
+    
+    .feature-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 15px 25px rgba(10, 31, 68, 0.2);
+    }
+    
+    .feature-card:hover::before {
+      width: 6px;
+    }
+    
+    .feature-icon {
+      font-size: 2.5rem;
+      background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 15px;
+      transition: transform 0.3s ease;
+    }
+    
+    .feature-card:hover .feature-icon {
+      transform: scale(1.1);
+    }
+    
+    .login-btn {
+      position: relative;
+      overflow: hidden;
+      background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+      color: white;
+      font-weight: 600;
+      border: none;
+      padding: 14px 30px;
+      border-radius: 50px;
+      box-shadow: 0 5px 15px rgba(10, 31, 68, 0.3);
+      transition: all 0.3s ease;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      font-size: 0.9rem;
+    }
+    
+    .login-btn:hover {
+      box-shadow: 0 8px 20px rgba(10, 31, 68, 0.4);
+      transform: translateY(-2px);
+    }
+    
+    .login-btn:active {
+      transform: translateY(1px);
+      box-shadow: 0 3px 10px rgba(10, 31, 68, 0.4);
+    }
+    
+    .login-btn i {
+      margin-left: 8px;
+      transition: transform 0.3s ease;
+    }
+    
+    .login-btn:hover i {
+      transform: translateX(4px);
+    }
+    
+    .form-floating {
+      margin-bottom: 20px;
+    }
+    
+    .form-floating > .form-control {
+      padding: 1.5rem 1rem;
+      height: calc(3.5rem + 2px);
+      border: 2px solid rgba(0, 0, 0, 0.08);
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+      border-radius: 10px;
+      transition: all 0.3s ease;
+    }
+    
+    .form-floating > .form-control:focus {
+      border-color: var(--primary-color);
+      box-shadow: 0 5px 15px rgba(10, 31, 68, 0.1);
+    }
+    
+    .form-floating > label {
+      padding: 1rem;
+    }
+    
+    .input-icon {
+      position: absolute;
+      right: 15px;
+      top: 17px;
+      color: var(--secondary-color);
+      z-index: 5;
+    }
+    
+    .form-control:focus + label + .input-icon {
+      color: var(--primary-color);
+    }
+    
+    .stats-card {
+      background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+      color: white;
+      border-radius: 15px;
+      padding: 25px;
+      margin-bottom: 20px;
+      text-align: center;
+      box-shadow: 0 10px 20px rgba(10, 31, 68, 0.2);
+      transition: all 0.3s ease;
+    }
+    
+    .stats-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 15px 30px rgba(10, 31, 68, 0.3);
+    }
+    
+    .stats-number {
+      font-size: 2.8rem;
+      font-weight: bold;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+    
+    .copyright {
+      margin-top: 30px;
+      width: 100%;
+      text-align: center;
+      color: var(--secondary-color);
+      font-size: 0.9rem;
+    }
 
-{% block content %}
-<div class="container mt-5">
-  <div class="row justify-content-center">
-    <div class="col-md-6 col-lg-4">
-      <div class="card shadow">
-        <div class="card-header bg-primary text-white">
-          <h4 class="mb-0">Police FIR System Login</h4>
-        </div>
-        <div class="card-body">
-          {% if error %}
-          <div class="alert alert-danger">{{ error }}</div>
-          {% endif %}
-          <form method="post">
+    .page-header {
+      text-align: center;
+      margin-bottom: 30px;
+      color: #212529;
+    }
+    
+    .page-header h1 {
+      font-weight: 700;
+      position: relative;
+      display: inline-block;
+      padding-bottom: 10px;
+    }
+    
+    .page-header h1::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 80px;
+      height: 3px;
+      background: linear-gradient(90deg, var(--primary-color), var(--primary-dark));
+      border-radius: 3px;
+    }
+    
+    .form-check-input {
+      width: 20px;
+      height: 20px;
+      border: 2px solid rgba(10, 31, 68, 0.3);
+      border-radius: 4px;
+      margin-right: 8px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    
+    .form-check-input:checked {
+      background-color: var(--primary-color);
+      border-color: var(--primary-color);
+    }
+    
+    .form-check-label {
+      cursor: pointer;
+      font-weight: 500;
+      padding-top: 2px;
+    }
+    
+    .remember-forgot-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 25px;
+    }
+    
+    .form-check {
+      margin: 0;
+    }
+    
+    a.forgot-link {
+      color: var(--primary-dark);
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.3s ease;
+      font-size: 0.95rem;
+    }
+    
+    a.forgot-link:hover {
+      color: var(--accent-color);
+      text-decoration: underline;
+    }
+    
+    .system-title {
+      font-weight: 700;
+      margin-bottom: 5px;
+      color: var(--primary-color);
+      font-size: 1.8rem;
+    }
+    
+    .system-subtitle {
+      color: var(--secondary-color);
+      font-weight: 500;
+      margin-bottom: 30px;
+    }
+    
+    .help-text {
+      margin-top: 25px;
+      padding-top: 20px;
+      border-top: 1px solid rgba(0,0,0,0.05);
+    }
+    
+    .help-text a {
+      color: var(--primary-dark);
+      font-weight: 500;
+      text-decoration: none;
+    }
+    
+    .help-text a:hover {
+      text-decoration: underline;
+    }
+    
+    .card-title {
+      font-weight: 600;
+      margin-bottom: 15px;
+      color: var(--primary-color);
+    }
+    
+    .card-text {
+      color: #6c757d;
+      line-height: 1.6;
+    }
+    
+    .hindi-title {
+      font-family: 'Noto Sans Devanagari', 'Segoe UI', sans-serif;
+      font-size: 2.2rem;
+      margin-bottom: 5px;
+      background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    
+    .justice-icon {
+      width: 80px;
+      height: 80px;
+      margin-bottom: 15px;
+      opacity: 0.9;
+    }
+    
+    .case-update-badge {
+      position: absolute;
+      top: -8px;
+      right: -8px;
+      background-color: var(--primary-dark);
+      color: white;
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.7rem;
+      font-weight: bold;
+    }
+    
+    .legal-pattern {
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      width: 150px;
+      height: 150px;
+      opacity: 0.05;
+      background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path d="M50,0 L100,50 L50,100 L0,50 Z" fill="%235e0b15"/></svg>');
+      background-size: contain;
+      z-index: 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="page-header">
+    <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><path d='M30,10 L70,10 L80,30 L90,30 L90,70 L80,70 L70,90 L30,90 L20,70 L10,70 L10,30 L20,30 Z' fill='%230a1f44'/><circle cx='50' cy='50' r='20' fill='%235e0b15'/></svg>" class="justice-icon" alt="Scales of Justice">
+    <h1 class="hindi-title">न्याय सेतु</h1>
+  </div>
+
+  <div class="welcome-container">
+    <div class="card main-card mb-4">
+      <div class="row g-0">
+        <div class="col-md-5 login-section">
+          <div class="text-center mb-4">
+            <i class="bi bi-shield-lock system-logo"></i>
+            <h2 class="system-title">Nyaya Setu Portal</h2>
+            <p class="system-subtitle">Bridging Justice with Technology</p>
+          </div>
+          
+          <form action="/login/" method="post">
             {% csrf_token %}
-            <div class="form-group">
+            <div class="form-floating">
+              <input type="text" class="form-control" id="username" name="username" placeholder="Username" required>
               <label for="username">Username</label>
-              <input type="text" class="form-control" id="username" name="username" required>
+              <i class="bi bi-person-badge input-icon"></i>
             </div>
-            <div class="form-group">
+            
+            <div class="form-floating">
+              <input type="password" class="form-control" id="password" name="password" placeholder="Password" required>
               <label for="password">Password</label>
-              <input type="password" class="form-control" id="password" name="password" required>
+              <i class="bi bi-key input-icon"></i>
             </div>
-            {% csrf_token %}
-            <button type="submit">Submit</button>
+            
+            <div class="remember-forgot-row">
+              <div class="form-check">
+                <input type="checkbox" class="form-check-input" id="rememberMe">
+                <label class="form-check-label" for="rememberMe">Remember me</label>
+              </div>
+              <a href="#" class="forgot-link">Forgot password?</a>
+            </div>
+            
+            <div class="d-grid">
+              <button type="submit" class="login-btn">
+                Sign In <i class="bi bi-arrow-right-circle"></i>
+              </button>
+            </div>
           </form>
           
-          <div class="text-center mt-3">
-            {% comment %} <p>New officer? <a href="{% url 'register_admin_view' %}">Register here</a></p> {% endcomment %}
+          <div class="text-center help-text">
+            <p class="text-muted">Need assistance? <a href="#">Contact your station admin</a></p>
+          </div>
+          <div class="legal-pattern"></div>
+        </div>
+        
+        <div class="col-md-7 feature-section">
+          <h3 class="mb-4 fw-bold" style="color: var(--primary-color);">AI-Powered Justice Platform</h3>
+          
+          <div class="row g-4 mb-4">
+            <div class="col-sm-6">
+              <div class="stats-card">
+                <div class="stats-number">98%</div>
+                <div>Case Processing Efficiency</div>
+              </div>
+            </div>
+            <div class="col-sm-6">
+              <div class="stats-card">
+                <div class="stats-number">24/7</div>
+                <div>System Availability</div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="row g-4">
+            <div class="col-md-6">
+              <div class="card feature-card h-100">
+                <div class="card-body">
+                  <i class="bi bi-file-earmark-text feature-icon"></i>
+                  <h5 class="card-title">Digital FIR Management</h5>
+                  <p class="card-text">Streamlined digital FIR filing with automated case number generation and tracking.</p>
+                </div>
+              </div>
+            </div>
+            
+            <div class="col-md-6">
+              <div class="card feature-card h-100">
+                <div class="card-body">
+                  <i class="bi bi-robot feature-icon"></i>
+                  <h5 class="card-title">AI Case Analysis</h5>
+                  <p class="card-text">Smart pattern recognition and case similarity detection powered by AI.</p>
+                </div>
+              </div>
+            </div>
+            
+            <div class="col-md-6">
+              <div class="card feature-card h-100">
+                <div class="card-body position-relative">
+                  <i class="bi bi-bell feature-icon"></i>
+                  <div class="case-update-badge">3</div>
+                  <h5 class="card-title">Real-time Updates</h5>
+                  <p class="card-text">Instant notifications for case developments and court dates.</p>
+                </div>
+              </div>
+            </div>
+            
+            <div class="col-md-6">
+              <div class="card feature-card h-100">
+                <div class="card-body">
+                  <i class="bi bi-shield-lock feature-icon"></i>
+                  <h5 class="card-title">Secure & Compliant</h5>
+                  <p class="card-text">Blockchain-verified evidence logs and secure access controls.</p>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </div>
   </div>
-</div>
-{% endblock %}
+  
+  <div class="copyright">
+    © 2025 न्याय सेतु (Nyaya Setu) - Ministry of Home Affairs. All rights reserved.
+  </div>
+</body>
+</html>

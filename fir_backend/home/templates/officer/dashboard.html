@@ -1,80 +1,68 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="container-fluid">
-  <h2 class="mb-4">Officer Dashboard</h2>
+<div class="container-fluid py-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="mb-0" style="color: #0a1f44;">
+      <i class="bi bi-shield-check me-2"></i>Officer Dashboard
+    </h2>
+    <div>
+      <a href="{% url 'officer_fir_create' %}" class="btn" style="background: linear-gradient(135deg, #0a1f44 0%, #5e0b15 100%); color: white;">
+        <i class="bi bi-file-earmark-plus me-1"></i> Create New FIR
+      </a>
+    </div>
+  </div>
   
-  <div class="row">
-    <div class="col-md-3">
-      <div class="card text-white bg-primary mb-3">
-        <div class="card-body">
-          <h5 class="card-title">Total Cases</h5>
-          <h2 class="card-text">{{ total_firs }}</h2>
-        </div>
-      </div>
-    </div>
-    <div class="col-md-3">
-      <div class="card text-white bg-warning mb-3">
-        <div class="card-body">
-          <h5 class="card-title">Pending Cases</h5>
-          <h2 class="card-text">{{ pending_firs }}</h2>
-        </div>
-      </div>
-    </div>
-    <div class="col-md-3">
-      <div class="card text-white bg-danger mb-3">
-        <div class="card-body">
-          <h5 class="card-title">Overdue Cases</h5>
-          <h2 class="card-text">{{ overdue_firs }}</h2>
-        </div>
-      </div>
-    </div>
-    <div class="col-md-3">
-      <div class="card text-white bg-success mb-3">
-        <div class="card-body">
-          <h5 class="card-title">New FIR</h5>
-          <a href="{% url 'officer_fir_create' %}" class="btn btn-light btn-block mt-2">Create</a>
+  <!-- Stats Cards Section -->
+  <div class="row g-3 mb-4">
+    <div class="col-md-4">
+      <div class="card border-0 shadow-sm h-100" style="background: linear-gradient(135deg, #0a1f44 0%, #5e0b15 100%); color: white;">
+        <div class="card-body d-flex align-items-center">
+          <div class="rounded-circle bg-white bg-opacity-20 p-3 me-3">
+            <i class="bi bi-folder-fill text-white fs-3"></i>
+          </div>
+          <div>
+            <h6 class="mb-1">Total Cases</h6>
+            <h3 class="mb-0">{{ total_firs }}</h3>
+          </div>
         </div>
       </div>
     </div>
   </div>
 
-  <div class="card mt-4">
-    <div class="card-header">
-      <h5>Recent Cases</h5>
+  <!-- Recent Cases Section -->
+  <div class="card border-0 shadow-sm">
+    <div class="card-header d-flex justify-content-between align-items-center" style="background-color: #0a1f44; color: white;">
+      <h5 class="mb-0"><i class="bi bi-file-earmark-text me-2"></i>Recent Cases</h5>
     </div>
-    <div class="card-body">
+    <div class="card-body p-0">
       <div class="table-responsive">
-        <table class="table table-hover">
-          <thead>
+        <table class="table table-hover mb-0">
+          <thead style="background-color: #f8f5f0;">
             <tr>
-              <th>FIR No.</th>
-              <th>Complainant</th>
-              <th>Incident Date</th>
-              <th>Status</th>
-              <th>Deadline</th>
-              <th>Actions</th>
+              <th style="color: #0a1f44;">FIR No.</th>
+              <th style="color: #0a1f44;">Complainant</th>
+              <th style="color: #0a1f44;">Incident Date</th>
+              <th class="text-end" style="color: #0a1f44;">Actions</th>
             </tr>
           </thead>
           <tbody>
             {% for fir in recent_firs %}
-            <tr class="{% if fir.investigation_deadline and fir.investigation_deadline < timezone.now %}table-danger{% endif %}">
-              <td>{{ fir.fir_number }}</td>
+            <tr class="{% if fir.investigation_deadline and fir.investigation_deadline < timezone.now %}bg-danger bg-opacity-10{% endif %}">
+              <td><strong>{{ fir.fir_number }}</strong></td>
               <td>{{ fir.complainant_name }}</td>
               <td>{{ fir.incident_date|date:"d/m/Y" }}</td>
-              <td><span class="badge badge-{{ fir.get_status_class }}">{{ fir.get_status_display }}</span></td>
-              <td>
-                {% if fir.investigation_deadline %}
-                  {{ fir.investigation_deadline|date:"d/m/Y" }}
-                  {% if fir.investigation_deadline < timezone.now %}
-                    <span class="badge badge-danger">Overdue</span>
-                  {% endif %}
-                {% else %}
-                  -
-                {% endif %}
+             
+              <td class="text-end">
+                <a href="{% url 'officer_fir_detail' pk=fir.pk %}" class="btn btn-sm me-1" style="background-color: #0a1f44; color: white;">
+                  <i class="bi bi-eye"></i>
+                </a>
               </td>
-              <td>
-                <a href="{% url 'officer_fir_detail' pk=fir.pk %}" class="btn btn-sm btn-info">View</a>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="6" class="text-center py-3 text-muted">
+                <i class="bi bi-info-circle me-2"></i>No cases to display
               </td>
             </tr>
             {% endfor %}
@@ -84,4 +72,38 @@
     </div>
   </div>
 </div>
+
+<style>
+  .card {
+    border-radius: 10px;
+    overflow: hidden;
+    transition: transform 0.3s, box-shadow 0.3s;
+  }
+  
+  .card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(10, 31, 68, 0.2) !important;
+  }
+  
+  .table-hover tbody tr:hover {
+    background-color: rgba(10, 31, 68, 0.05) !important;
+  }
+  
+  .badge {
+    border-radius: 4px;
+    padding: 4px 8px;
+    font-weight: 500;
+  }
+  
+  .dropdown-menu {
+    border: none;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+  }
+  
+  .dropdown-item:hover {
+    background-color: #f8f5f0;
+    color: #0a1f44;
+  }
+</style>
 {% endblock %}

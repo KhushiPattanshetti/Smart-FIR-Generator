@@ -1,3 +1,469 @@
-from django.test import TestCase
+# from django.test import TestCase
+# from django.contrib.auth import get_user_model
+# from .models import Station, FIR, LegalSuggestion, Notification
+# from django.core.exceptions import ValidationError
+# from django.utils import timezone
 
-# Create your tests here.
+# User = get_user_model()
+# class UserModelTest(TestCase):
+#     def setUp(self):
+#         self.station = Station.objects.create(
+#             name="Central Police Station",
+#             location="Downtown",
+#             contact_number="1234567890"
+#         )
+        
+#     def test_create_user(self):
+#         user = User.objects.create_user(
+#             username="officer1",
+#             password="testpass123",
+#             role="police_officer",
+#             station=self.station
+#         )
+#         self.assertEqual(user.role, "police_officer")
+#         self.assertEqual(user.station.name, "Central Police Station")
+#         self.assertTrue(user.is_active)
+#         self.assertFalse(user.is_superuser)
+    
+#     def test_create_superuser(self):
+#         admin = User.objects.create_superuser(
+#             username="admin1",
+#             password="adminpass123",
+#             role="admin"
+#         )
+#         self.assertEqual(admin.role, "admin")
+#         self.assertTrue(admin.is_superuser)
+#         self.assertTrue(admin.is_staff)
+    
+#     def test_user_string_representation(self):
+#         user = User.objects.create_user(
+#             username="officer2",
+#             password="testpass123",
+#             role="police_officer"
+#         )
+#         self.assertEqual(str(user), "officer2 (Police Officer)")
+
+# class StationModelTest(TestCase):
+#     def test_create_station(self):
+#         station = Station.objects.create(
+#             name="North Police Station",
+#             location="Uptown",
+#             contact_number="9876543210"
+#         )
+#         self.assertEqual(station.name, "North Police Station")
+#         self.assertEqual(station.location, "Uptown")
+#         self.assertTrue(station.created_at)
+    
+#     def test_station_string_representation(self):
+#         station = Station.objects.create(
+#             name="South Police Station",
+#             location="Suburb",
+#             contact_number="5551234567"
+#         )
+#         self.assertEqual(str(station), "South Police Station")
+
+# class FIRModelTest(TestCase):
+#     def setUp(self):
+#         self.station = Station.objects.create(
+#             name="Central Station",
+#             location="City Center",
+#             contact_number="1112223333"
+#         )
+#         self.officer = User.objects.create_user(
+#             username="officer1",
+#             password="testpass123",
+#             role="police_officer",
+#             station=self.station
+#         )
+    
+#     def test_create_fir(self):
+#         fir = FIR.objects.create(
+#             fir_number="FIR123",
+#             complainant_name="John Doe",
+#             complainant_contact="5554443333",
+#             incident_description="Stolen bicycle",
+#             incident_date=timezone.now().date(),
+#             incident_location="Main Street",
+#             status="draft",
+#             police_officer=self.officer,
+#             station=self.station
+#         )
+#         self.assertEqual(fir.fir_number, "FIR123")
+#         self.assertEqual(fir.complainant_name, "John Doe")
+#         self.assertEqual(fir.status, "draft")
+#         self.assertEqual(fir.police_officer.username, "officer1")
+#         self.assertTrue(fir.created_at)
+#         self.assertTrue(fir.updated_at)
+    
+#     def test_fir_string_representation(self):
+#         fir = FIR.objects.create(
+#             fir_number="FIR456",
+#             complainant_name="Jane Smith",
+#             complainant_contact="5554443333",
+#             incident_description="Stolen phone",
+#             incident_date=timezone.now().date(),
+#             incident_location="Park Avenue",
+#             status="submitted",
+#             police_officer=self.officer,
+#             station=self.station
+#         )
+#         self.assertEqual(str(fir), "FIR456 - Jane Smith (Submitted)")
+    
+#     def test_fir_status_class(self):
+#         fir = FIR.objects.create(
+#             fir_number="FIR789",
+#             complainant_name="Test User",
+#             complainant_contact="5554443333",
+#             incident_description="Test incident",
+#             incident_date=timezone.now().date(),
+#             incident_location="Test Location",
+#             status="closed",
+#             police_officer=self.officer,
+#             station=self.station
+#         )
+#         self.assertEqual(fir.get_status_class(), "success")
+    
+#     def test_fir_ordering(self):
+#         fir1 = FIR.objects.create(
+#             fir_number="FIR001",
+#             complainant_name="First",
+#             complainant_contact="111",
+#             incident_description="First incident",
+#             incident_date=timezone.now().date(),
+#             incident_location="First location",
+#             police_officer=self.officer,
+#             station=self.station
+#         )
+#         fir2 = FIR.objects.create(
+#             fir_number="FIR002",
+#             complainant_name="Second",
+#             complainant_contact="222",
+#             incident_description="Second incident",
+#             incident_date=timezone.now().date(),
+#             incident_location="Second location",
+#             police_officer=self.officer,
+#             station=self.station
+#         )
+#         firs = FIR.objects.all()
+#         self.assertEqual(firs[0], fir2)
+#         self.assertEqual(firs[1], fir1)
+
+# class LegalSuggestionModelTest(TestCase):
+#     def setUp(self):
+#         self.station = Station.objects.create(
+#             name="Legal Station",
+#             location="Court Area",
+#             contact_number="9998887777"
+#         )
+#         self.officer = User.objects.create_user(
+#             username="legal_officer",
+#             password="testpass123",
+#             role="police_officer",
+#             station=self.station
+#         )
+#         self.fir = FIR.objects.create(
+#             fir_number="FIRLEGAL",
+#             complainant_name="Legal Case",
+#             complainant_contact="5554443333",
+#             incident_description="Legal matter",
+#             incident_date=timezone.now().date(),
+#             incident_location="Court Street",
+#             police_officer=self.officer,
+#             station=self.station
+#         )
+    
+#     def test_create_legal_suggestion(self):
+#         suggestion = LegalSuggestion.objects.create(
+#             fir=self.fir,
+#             ipc_section="IPC 420",
+#             description="Cheating and dishonesty",
+#             confidence_score=0.85
+#         )
+#         self.assertEqual(suggestion.ipc_section, "IPC 420")
+#         self.assertEqual(suggestion.confidence_score, 0.85)
+#         self.assertEqual(suggestion.fir.fir_number, "FIRLEGAL")
+    
+#     def test_legal_suggestion_string_representation(self):
+#         suggestion = LegalSuggestion.objects.create(
+#             fir=self.fir,
+#             ipc_section="IPC 302",
+#             confidence_score=0.9
+#         )
+#         self.assertEqual(str(suggestion), "IPC 302 for FIRLEGAL")
+
+# class NotificationModelTest(TestCase):
+#     def setUp(self):
+#         self.user = User.objects.create_user(
+#             username="notified_user",
+#             password="testpass123",
+#             role="police_officer"
+#         )
+    
+#     def test_create_notification(self):
+#         notification = Notification.objects.create(
+#             user=self.user,
+#             message="New FIR assigned to you",
+#             link="/firs/1/"
+#         )
+#         self.assertEqual(notification.message, "New FIR assigned to you")
+#         self.assertEqual(notification.link, "/firs/1/")
+#         self.assertFalse(notification.read)
+#         self.assertTrue(notification.created_at)
+    
+#     def test_notification_string_representation(self):
+#         notification = Notification.objects.create(
+#             user=self.user,
+#             message="Test notification"
+#         )
+#         self.assertEqual(str(notification), "Notification for notified_user")
+    
+#     def test_notification_ordering(self):
+#         notification1 = Notification.objects.create(
+#             user=self.user,
+#             message="First notification"
+#         )
+#         notification2 = Notification.objects.create(
+#             user=self.user,
+#             message="Second notification"
+#         )
+#         notifications = Notification.objects.all()
+#         self.assertEqual(notifications[0], notification2)
+#         self.assertEqual(notifications[1], notification1)
+
+from django.test import TestCase, RequestFactory
+from django.contrib.auth import get_user_model
+from django.urls import reverse
+from django.contrib.messages import get_messages
+from django.core.files.uploadedfile import SimpleUploadedFile
+from .models import Station, FIR, LegalSuggestion, Notification
+from .views import *
+
+User = get_user_model()
+
+class BaseTestCase(TestCase):
+    def setUp(self):
+        self.factory = RequestFactory()
+        
+        # Create test users
+        self.admin = User.objects.create_superuser(
+            username='admin',
+            password='adminpass',
+            role='admin'
+        )
+        
+        self.station = Station.objects.create(
+            name='Test Station',
+            location='Test Location',
+            contact_number='1234567890'
+        )
+        
+        self.officer = User.objects.create_user(
+            username='officer',
+            password='officerpass',
+            role='police_officer',
+            station=self.station
+        )
+        
+        # Create test FIR
+        self.fir = FIR.objects.create(
+            fir_number='FIR-001',
+            complainant_name='Test Complainant',
+            complainant_contact='9876543210',
+            incident_description='Test incident',
+            incident_date=timezone.now().date(),
+            incident_location='Test Location',
+            police_officer=self.officer,
+            station=self.station
+        )
+
+class AuthenticationTests(BaseTestCase):
+    def test_login_view_get(self):
+        response = self.client.get(reverse('login'))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'auth/login.html')
+    
+    def test_login_view_post_success_admin(self):
+        response = self.client.post(reverse('login'), {
+            'username': 'admin',
+            'password': 'adminpass'
+        })
+        self.assertRedirects(response, reverse('admin_dashboard'))
+    
+    def test_login_view_post_success_officer(self):
+        response = self.client.post(reverse('login'), {
+            'username': 'officer',
+            'password': 'officerpass'
+        })
+        self.assertRedirects(response, reverse('officer_dashboard'))
+    
+    def test_login_view_post_failure(self):
+        response = self.client.post(reverse('login'), {
+            'username': 'wrong',
+            'password': 'wrong'
+        })
+        self.assertEqual(response.status_code, 200)
+        messages = list(get_messages(response.wsgi_request))
+        self.assertEqual(str(messages[0]), "Invalid username or password")
+    
+    def test_logout_view(self):
+        self.client.login(username='admin', password='adminpass')
+        response = self.client.get(reverse('logout'))
+        self.assertRedirects(response, reverse('login'))
+
+class AdminViewsTests(BaseTestCase):
+    def setUp(self):
+        super().setUp()
+        self.client.login(username='admin', password='adminpass')
+    
+    # Dashboard
+    def test_admin_dashboard(self):
+        response = self.client.get(reverse('admin_dashboard'))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'admin/dashboard.html')
+        self.assertEqual(response.context['total_stations'], 1)
+    
+    # Station Management
+    def test_station_list_view(self):
+        response = self.client.get(reverse('station_list'))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'admin/stations/list.html')
+        self.assertEqual(len(response.context['stations']), 1)
+    
+    def test_station_create_view(self):
+        response = self.client.post(reverse('station_create'), {
+            'name': 'New Station',
+            'location': 'New Location',
+            'contact_number': '9876543210'
+        })
+        self.assertRedirects(response, reverse('station_list'))
+        self.assertEqual(Station.objects.count(), 2)
+    
+    def test_station_edit_view(self):
+        response = self.client.post(reverse('station_edit', args=[self.station.pk]), {
+            'name': 'Updated Station',
+            'location': 'Updated Location',
+            'contact_number': '9876543210'
+        })
+        self.assertRedirects(response, reverse('station_list'))
+        self.station.refresh_from_db()
+        self.assertEqual(self.station.name, 'Updated Station')
+    
+    def test_station_delete_view(self):
+        response = self.client.post(reverse('station_delete', args=[self.station.pk]))
+        self.assertRedirects(response, reverse('station_list'))
+        self.assertEqual(Station.objects.count(), 0)
+    
+    # User Management
+    def test_user_list_view(self):
+        response = self.client.get(reverse('user_list'))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'admin/users/list.html')
+        self.assertEqual(len(response.context['users']), 2)
+    
+    def test_user_create_view(self):
+        response = self.client.post(reverse('user_create'), {
+            'username': 'newuser',
+            'password': 'newpass',
+            'role': 'police_officer',
+            'station': self.station.pk
+        })
+        self.assertRedirects(response, reverse('user_list'))
+        self.assertEqual(User.objects.count(), 3)
+    
+    # FIR Management
+    def test_admin_fir_list_view(self):
+        response = self.client.get(reverse('admin_fir_list'))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'admin/firs/list.html')
+        self.assertEqual(len(response.context['firs']), 1)
+    
+    def test_admin_fir_detail_view(self):
+        response = self.client.get(reverse('admin_fir_detail', args=[self.fir.pk]))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'admin/firs/detail.html')
+
+class OfficerViewsTests(BaseTestCase):
+    def setUp(self):
+        super().setUp()
+        self.client.login(username='officer', password='officerpass')
+    
+    def test_officer_dashboard(self):
+        response = self.client.get(reverse('officer_dashboard'))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'officer/dashboard.html')
+        self.assertEqual(response.context['total_firs'], 1)
+    
+    def test_officer_fir_list_view(self):
+        response = self.client.get(reverse('officer_fir_list'))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'officer/firs/list.html')
+        self.assertEqual(len(response.context['firs']), 1)
+    
+    def test_officer_fir_create_view(self):
+        response = self.client.post(reverse('officer_fir_create'), {
+            'complainant_name': 'New Complainant',
+            'complainant_contact': '1234567890',
+            'incident_description': 'New incident',
+            'incident_date': timezone.now().date(),
+            'incident_location': 'New location'
+        })
+        self.assertEqual(FIR.objects.count(), 2)
+        new_fir = FIR.objects.latest('created_at')
+        self.assertRedirects(response, reverse('officer_fir_detail', args=[new_fir.pk]))
+    
+    def test_officer_fir_detail_view(self):
+        response = self.client.get(reverse('officer_fir_detail', args=[self.fir.pk]))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'officer/firs/detail.html')
+    
+    def test_officer_fir_update_view(self):
+        response = self.client.post(reverse('officer_fir_update', args=[self.fir.pk]), {
+            'complainant_name': 'Updated Complainant',
+            'complainant_contact': '1234567890',
+            'incident_description': 'Updated incident',
+            'incident_date': timezone.now().date(),
+            'incident_location': 'Updated location'
+        })
+        self.assertRedirects(response, reverse('officer_fir_detail', args=[self.fir.pk]))
+        self.fir.refresh_from_db()
+        self.assertEqual(self.fir.complainant_name, 'Updated Complainant')
+    
+    def test_generate_legal_suggestions_view(self):
+        response = self.client.get(reverse('generate_legal_suggestions', args=[self.fir.pk]))
+        self.assertRedirects(response, reverse('officer_fir_detail', args=[self.fir.pk]))
+        self.assertTrue(LegalSuggestion.objects.filter(fir=self.fir).exists())
+
+class PermissionTests(BaseTestCase):
+    def test_admin_accessing_officer_views(self):
+        self.client.login(username='admin', password='adminpass')
+        response = self.client.get(reverse('officer_dashboard'))
+        self.assertEqual(response.status_code, 403)
+    
+    def test_officer_accessing_admin_views(self):
+        self.client.login(username='officer', password='officerpass')
+        response = self.client.get(reverse('admin_dashboard'))
+        self.assertEqual(response.status_code, 403)
+    
+    def test_unauthenticated_access(self):
+        response = self.client.get(reverse('admin_dashboard'))
+        self.assertRedirects(response, f"{reverse('login')}?next={reverse('admin_dashboard')}")
+
+class UtilityFunctionTests(BaseTestCase):
+    def test_generate_fir_number(self):
+        fir_number = generate_fir_number()
+        self.assertTrue(fir_number.startswith('FIR-'))
+        self.assertIn(datetime.now().strftime('%Y%m%d'), fir_number)
+    
+    def test_can_access_fir(self):
+        self.assertTrue(can_access_fir(self.admin, self.fir))
+        self.assertTrue(can_access_fir(self.officer, self.fir))
+        
+        # Create another officer
+        other_officer = User.objects.create_user(
+            username='other',
+            password='otherpass',
+            role='police_officer',
+            station=self.station
+        )
+        self.assertFalse(can_access_fir(other_officer, self.fir))
+        

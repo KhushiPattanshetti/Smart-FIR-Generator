@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nyaya Setu - Bridge of Justice</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Times New Roman', serif;
+        }
+
+        :root {
+            --navy-blue: #0A1747;
+            --maroon: #7D1935;
+            --ivory: #FFFFF0;
+            --gold: #D4AF37;
+        }
+
+        body {
+            background-color: #F5F5F5;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .container {
+            position: relative;
+            width: 90%;
+            max-width: 600px;
+            background: white;
+            border-radius: 8px;
+            padding: 40px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+
+        .emblem {
+            width: 100px;
+            height: 100px;
+            position: relative;
+            margin-right: 20px;
+        }
+
+        .ashoka-chakra {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 3px solid var(--navy-blue);
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .spokes {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+        }
+
+        .spoke {
+            position: absolute;
+            width: 1.5px;
+            height: 50%;
+            background: var(--navy-blue);
+            left: 50%;
+            top: 0;
+            transform-origin: bottom center;
+        }
+
+        /* Generate 24 spokes */
+        .spoke:nth-child(1) { transform: translateX(-50%) rotate(0deg); }
+        .spoke:nth-child(2) { transform: translateX(-50%) rotate(15deg); }
+        .spoke:nth-child(3) { transform: translateX(-50%) rotate(30deg); }
+        .spoke:nth-child(4) { transform: translateX(-50%) rotate(45deg); }
+        .spoke:nth-child(5) { transform: translateX(-50%) rotate(60deg); }
+        .spoke:nth-child(6) { transform: translateX(-50%) rotate(75deg); }
+        .spoke:nth-child(7) { transform: translateX(-50%) rotate(90deg); }
+        .spoke:nth-child(8) { transform: translateX(-50%) rotate(105deg); }
+        .spoke:nth-child(9) { transform: translateX(-50%) rotate(120deg); }
+        .spoke:nth-child(10) { transform: translateX(-50%) rotate(135deg); }
+        .spoke:nth-child(11) { transform: translateX(-50%) rotate(150deg); }
+        .spoke:nth-child(12) { transform: translateX(-50%) rotate(165deg); }
+        .spoke:nth-child(13) { transform: translateX(-50%) rotate(180deg); }
+        .spoke:nth-child(14) { transform: translateX(-50%) rotate(195deg); }
+        .spoke:nth-child(15) { transform: translateX(-50%) rotate(210deg); }
+        .spoke:nth-child(16) { transform: translateX(-50%) rotate(225deg); }
+        .spoke:nth-child(17) { transform: translateX(-50%) rotate(240deg); }
+        .spoke:nth-child(18) { transform: translateX(-50%) rotate(255deg); }
+        .spoke:nth-child(19) { transform: translateX(-50%) rotate(270deg); }
+        .spoke:nth-child(20) { transform: translateX(-50%) rotate(285deg); }
+        .spoke:nth-child(21) { transform: translateX(-50%) rotate(300deg); }
+        .spoke:nth-child(22) { transform: translateX(-50%) rotate(315deg); }
+        .spoke:nth-child(23) { transform: translateX(-50%) rotate(330deg); }
+        .spoke:nth-child(24) { transform: translateX(-50%) rotate(345deg); }
+
+        .police-emblem {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            background-color: var(--navy-blue);
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: var(--gold);
+            font-weight: bold;
+            font-size: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .title-content {
+            text-align: left;
+        }
+
+        .title h1 {
+            color: var(--navy-blue);
+            font-size: 2rem;
+            margin-bottom: 5px;
+            letter-spacing: 1px;
+            font-weight: bold;
+        }
+
+        .title h2 {
+            color: var(--navy-blue);
+            font-size: 1.2rem;
+            font-weight: 400;
+            margin-bottom: 5px;
+        }
+
+        .title .tagline {
+            color: var(--maroon);
+            font-style: italic;
+            font-size: 1rem;
+            margin-bottom: 5px;
+        }
+
+        .divider {
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(to right, transparent, var(--navy-blue), transparent);
+            margin: 20px 0;
+        }
+
+        .description {
+            color: #333;
+            margin-bottom: 30px;
+            line-height: 1.6;
+            text-align: justify;
+            font-size: 0.95rem;
+        }
+
+        .next-button {
+            background: var(--navy-blue);
+            color: white;
+            border: none;
+            padding: 12px 40px;
+            font-size: 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: bold;
+        }
+
+        .next-button:hover {
+            background: #0d1f5a;
+        }
+
+        .footer {
+            margin-top: 30px;
+            font-size: 0.8rem;
+            color: #666;
+        }
+
+        /* Responsive Adjustments */
+        @media screen and (max-width: 600px) {
+            .container {
+                padding: 30px 20px;
+            }
+            
+            .header {
+                flex-direction: column;
+            }
+            
+            .emblem {
+                margin-right: 0;
+                margin-bottom: 15px;
+            }
+            
+            .title-content {
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="emblem">
+                <div class="ashoka-chakra">
+                    <div class="spokes">
+                        <div class="spoke"></div>
+                        <div class="spoke"></div>
+                        <div class="spoke"></div>
+                        <div class="spoke"></div>
+                        <div class="spoke"></div>
+                        <div class="spoke"></div>
+                        <div class="spoke"></div>
+                        <div class="spoke"></div>
+                        <div class="spoke"></div>
+                        <div class="spoke"></div>
+                        <div class="spoke"></div>
+                        <div class="spoke"></div>
+                        <div class="spoke"></div>
+                        <div class="spoke"></div>
+                        <div class="spoke"></div>
+                        <div class="spoke"></div>
+                        <div class="spoke"></div>
+                        <div class="spoke"></div>
+                        <div class="spoke"></div>
+                        <div class="spoke"></div>
+                        <div class="spoke"></div>
+                        <div class="spoke"></div>
+                        <div class="spoke"></div>
+                        <div class="spoke"></div>
+                    </div>
+                    <div class="police-emblem">POLICE</div>
+                </div>
+            </div>
+            
+            <div class="title-content">
+                <div class="title">
+                    {% comment %} <h1>Nyaya Setu</h1> {% endcomment %}
+                    <h1>न्याय सेतु</h1>
+                    <div class="tagline">Bridge of Justice</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="divider"></div>
+        
+        <div class="description">
+            <p>Welcome to Nyaya Setu, an official application of the Indian Police Service developed to enhance the accuracy and efficiency of First Information Report (FIR) registration.</p>
+            <br>
+            <p>This application addresses the challenge of unavailability of legal experts at police stations by providing intelligent assistance in determining the appropriate sections and acts to be included in FIRs, thereby reducing errors and improving subsequent investigation processes.</p>
+        </div>
+        
+        {% comment %} <button class="next-button">Proceed</button> {% endcomment %}
+        <form action="{% url 'login' %}" method="get">
+            <button type="submit" class="next-button">Proceed</button>
+        </form>
+        <div class="footer">
+            © 2025 Indian Police Service. All Rights Reserved.
+        </div>
+    </div>
+</body>
+</html>

@@ -2,12 +2,12 @@ from django.urls import path
 from home import views
 
 urlpatterns = [
+  
+    path('', views.homepage, name='home'),
+
     # Authentication URLs
     path('login/', views.login_view, name='login'),
     path('logout/', views.logout_view, name='logout'),
-    path('register/', views.register_view, name='register'),
-    path('register/admin/', views.register_admin_view, name='register_admin'),
-    path('forgot-password/', views.forgot_password, name='forgot_password'),
     
     # Admin URLs
     path('admin/dashboard/', views.admin_dashboard, name='admin_dashboard'),
@@ -28,9 +28,7 @@ urlpatterns = [
     path('admin/firs/', views.admin_fir_list_view, name='admin_fir_list'),
     path('admin/firs/<int:pk>/', views.admin_fir_detail_view, name='admin_fir_detail'),
     
-    # Reports
-    path('admin/reports/', views.report_generate_view, name='report_generate'),
-    
+
     # Police Officer URLs
     path('officer/dashboard/', views.officer_dashboard, name='officer_dashboard'),
     
@@ -43,16 +41,4 @@ urlpatterns = [
     # Legal Suggestions
    path('officer/firs/<int:pk>/legal-suggestions/', 
          views.generate_legal_suggestions_view, name='generate_legal_suggestions'),
-    
-    # Also update the charge sheet URL for consistency:
-    path('officer/firs/<int:pk>/charge-sheet/', 
-         views.generate_charge_sheet, name='generate_charge_sheet'),
-
-    # Notifications
-    path('notifications/', views.notifications_view, name='notifications'),
-    path('notifications/<int:notification_id>/mark-read/', 
-         views.mark_notification_read_view, name='mark_notification_read'),
-    
-    # Analytics
-    path('analytics/', views.dashboard_analytics, name='dashboard_analytics'),
 ]

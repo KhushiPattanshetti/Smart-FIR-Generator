@@ -1,36 +1,87 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="container-fluid">
+<div class="container-fluid py-4">
   <div class="d-flex justify-content-between align-items-center mb-4">
-    <h2>Police Stations</h2>
-    <a href="{% url 'admin_dashboard' %}" class="btn btn-outline-secondary mr-2">
-      <i class="fas fa-arrow-left"></i> Back to Dashboard
-    </a>
-    <a href="{% url 'station_create' %}" class="btn btn-primary">Add New Station</a>
+    <h2 class="mb-0" style="color: #0a1f44; font-weight: 600;">
+      <i class="bi bi-building me-2"></i>Police Stations
+    </h2>
+    <div class="d-flex gap-2">
+      <a href="{% url 'admin_dashboard' %}" class="btn py-2 px-3" style="background-color: #f8f5f0; color: #0a1f44; border: 1px solid #dee2e6;">
+        <i class="bi bi-arrow-left me-1"></i> Dashboard
+      </a>
+      <a href="{% url 'station_create' %}" class="btn py-2 px-3" style="background: linear-gradient(135deg, #0a1f44 0%, #5e0b15 100%); color: white;">
+        <i class="bi bi-plus-circle me-1"></i> New Station
+      </a>
+    </div>
   </div>
 
-  <div class="card">
-    <div class="card-body">
+  <div class="card border-0 shadow-sm">
+    <div class="card-header py-3" style="background-color: #0a1f44; color: white;">
+      <div class="d-flex justify-content-between align-items-center">
+        <h5 class="mb-0" style="font-weight: 500;">
+          <i class="bi bi-list-check me-2"></i>Station Directory
+        </h5>
+        <div class="input-group" style="max-width: 300px;">
+          <span class="input-group-text" style="background-color: #f8f5f0; color: #0a1f44;">
+            <i class="bi bi-search"></i>
+          </span>
+          <input type="text" class="form-control" placeholder="Search stations..." id="searchInput">
+        </div>
+      </div>
+    </div>
+    <div class="card-body p-0">
       <div class="table-responsive">
-        <table class="table table-hover">
-          <thead>
+        <table class="table table-hover mb-0" id="stationsTable">
+          <thead style="background-color: #f8f5f0;">
             <tr>
-              <th>Name</th>
-              <th>Location</th>
-              <th>Contact</th>
-              <th>Actions</th>
+              <th style="color: #0a1f44;">
+                <i class="bi bi-building me-1"></i> Station Name
+              </th>
+              <th style="color: #0a1f44;">
+                <i class="bi bi-geo-alt me-1"></i> Location
+              </th>
+              <th style="color: #0a1f44;">
+                <i class="bi bi-telephone me-1"></i> Contact
+              </th>
+              <th style="color: #0a1f44; text-align: right;">Actions</th>
             </tr>
           </thead>
           <tbody>
             {% for station in stations %}
             <tr>
-              <td>{{ station.name }}</td>
-              <td>{{ station.location }}</td>
-              <td>{{ station.contact_number }}</td>
               <td>
-                <a href="{% url 'station_edit' pk=station.pk %}" class="btn btn-sm btn-info">Edit</a>
-                <a href="{% url 'station_delete' pk=station.pk %}" class="btn btn-sm btn-danger">Delete</a>
+                <strong>{{ station.name }}</strong>
+              </td>
+              <td>
+                <span class="badge" style="background-color: #f8f5f0; color: #0a1f44; border: 1px solid #dee2e6;">
+                  <i class="bi bi-pin-map me-1"></i>{{ station.location }}
+                </span>
+              </td>
+              <td>
+                <span class="badge" style="background-color: #f8f5f0; color: #0a1f44; border: 1px solid #dee2e6;">
+                  <i class="bi bi-telephone-outbound me-1"></i>{{ station.contact_number }}
+                </span>
+              </td>
+              <td class="text-end">
+                <div class="d-flex justify-content-end gap-2">
+                  <a href="{% url 'station_edit' pk=station.pk %}" class="btn btn-sm" style="background-color: #f8f5f0; color: #0a1f44;">
+                    <i class="bi bi-pencil"></i> Edit
+                  </a>
+                  <a href="{% url 'station_delete' pk=station.pk %}" class="btn btn-sm" style="background-color: #f8f5f0; color: #dc3545;">
+                    <i class="bi bi-trash"></i> Delete
+                  </a>
+                </div>
+              </td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="4" class="text-center py-4">
+                <i class="bi bi-building fs-1" style="color: #adb5bd;"></i>
+                <h5 class="mt-3" style="color: #6c757d;">No police stations found</h5>
+                <a href="{% url 'station_create' %}" class="btn mt-3" style="background: linear-gradient(135deg, #0a1f44 0%, #5e0b15 100%); color: white;">
+                  <i class="bi bi-plus-circle me-1"></i> Add First Station
+                </a>
               </td>
             </tr>
             {% endfor %}
@@ -40,4 +91,38 @@
     </div>
   </div>
 </div>
+
+<script>
+  // Simple search functionality
+  document.getElementById('searchInput').addEventListener('keyup', function() {
+    const input = this.value.toLowerCase();
+    const rows = document.querySelectorAll('#stationsTable tbody tr');
+    
+    rows.forEach(row => {
+      const text = row.textContent.toLowerCase();
+      row.style.display = text.includes(input) ? '' : 'none';
+    });
+  });
+</script>
+
+<style>
+  .card {
+    transition: transform 0.3s, box-shadow 0.3s;
+  }
+  
+  .card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(10, 31, 68, 0.15) !important;
+  }
+  
+  .table-hover tbody tr:hover {
+    background-color: rgba(10, 31, 68, 0.05);
+  }
+  
+  .badge {
+    padding: 6px 10px;
+    border-radius: 20px;
+    font-weight: 500;
+  }
+</style>
 {% endblock %}
