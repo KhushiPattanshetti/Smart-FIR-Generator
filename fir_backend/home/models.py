@@ -2,7 +2,16 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.utils import timezone
 from django.core.validators import MinLengthValidator
+import os
+from uuid import uuid4
 
+# Function to generate unique file path for complaint audio
+def complaint_audio_path(instance, filename):
+    ext = filename.split('.')[-1]
+    filename = f"{uuid4().hex}.{ext}"
+    return os.path.join('complaints', 'audio', filename)
+
+# Custom user model
 class User(AbstractUser):
     ROLE_CHOICES = [
         ('admin', 'Admin'),
@@ -15,6 +24,7 @@ class User(AbstractUser):
     def __str__(self):
         return f"{self.username} ({self.get_role_display()})"
 
+# Police station model
 class Station(models.Model):
     name = models.CharField(max_length=100)
     location = models.CharField(max_length=200)
@@ -24,6 +34,7 @@ class Station(models.Model):
     def __str__(self):
         return self.name
 
+# FIR (First Information Report) model
 class FIR(models.Model):
     STATUS_CHOICES = [
         ('draft', 'Draft'),
@@ -45,7 +56,9 @@ class FIR(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     investigation_deadline = models.DateField(null=True, blank=True)
-    
+    # If you have audio uploads in FIR model, you can add this field (optional)
+    # complaint_audio = models.FileField(blank=True, null=True, upload_to=complaint_audio_path)
+
     class Meta:
         ordering = ['-created_at']
         verbose_name = "First Information Report"
@@ -60,10 +73,11 @@ class FIR(models.Model):
             'submitted': 'info',
             'under_investigation': 'warning',
             'closed': 'success',
-            'rejected': 'danger'
+            'rejected': 'danger',
         }
         return status_classes.get(self.status, 'secondary')
 
+# Legal suggestions linked to an FIR
 class LegalSuggestion(models.Model):
     fir = models.ForeignKey(FIR, on_delete=models.CASCADE, related_name='legal_suggestions')
     ipc_section = models.CharField(max_length=50)
@@ -74,6 +88,7 @@ class LegalSuggestion(models.Model):
     def __str__(self):
         return f"{self.ipc_section} for {self.fir.fir_number}"
 
+# Notifications for users
 class Notification(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     message = models.TextField()

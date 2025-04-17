@@ -22,11 +22,11 @@
       </div>
     </div>
     <div class="card-body">
-      <form method="post">
+      <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
         
         <div class="alert alert-info" role="alert">
-          <i class="bi bi-info-circle-fill me-2"></i> Fields marked with <span class="text-danger">*</span> are mandatory
+          <i class="bi bi-info-circle-fill me-2"></i> Please provide incident details in <strong>at least one</strong> format (text, image, or audio)
         </div>
         
         <h6 class="mt-4 mb-3 fw-bold" style="color: #5e0b15;">
@@ -85,13 +85,100 @@
           </div>
         </div>
         
+        <!-- Description Options Tabs -->
         <div class="mb-4">
-          <label for="incident_description" class="form-label fw-medium" style="color: #0a1f44;">
-            Detailed Description <span class="text-danger">*</span>
-          </label>
-          <textarea class="form-control" id="incident_description" name="incident_description" rows="6" placeholder="Provide detailed description" required></textarea>
-          <div class="form-text mt-2">
-            <i class="bi bi-lightbulb"></i> Tip: Be factual and chronological. Include all relevant details.
+          <ul class="nav nav-tabs" id="descriptionTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+              <button class="nav-link active" id="text-tab" data-bs-toggle="tab" data-bs-target="#text-tab-pane" type="button" role="tab">
+                <i class="bi bi-text-paragraph me-1"></i> Text Description
+              </button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button class="nav-link" id="image-tab" data-bs-toggle="tab" data-bs-target="#image-tab-pane" type="button" role="tab">
+                <i class="bi bi-image me-1"></i> Upload Image
+              </button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button class="nav-link" id="audio-tab" data-bs-toggle="tab" data-bs-target="#audio-tab-pane" type="button" role="tab">
+                <i class="bi bi-mic me-1"></i> Record Audio
+              </button>
+            </li>
+          </ul>
+          
+          <div class="tab-content p-3 border border-top-0 rounded-bottom" style="background-color: white;">
+            <!-- Text Description Tab -->
+            <div class="tab-pane fade show active" id="text-tab-pane" role="tabpanel" aria-labelledby="text-tab">
+              <label for="incident_description" class="form-label fw-medium" style="color: #0a1f44;">
+                Describe the incident in detail
+              </label>
+              <textarea class="form-control" id="incident_description" name="incident_description" rows="6" placeholder="Provide detailed description of what happened"></textarea>
+              <div class="form-text mt-2">
+                <i class="bi bi-lightbulb"></i> Tip: Be factual and chronological. Include all relevant details.
+              </div>
+            </div>
+            
+            <!-- Image Upload Tab -->
+            <div class="tab-pane fade" id="image-tab-pane" role="tabpanel" aria-labelledby="image-tab">
+              <label class="form-label fw-medium" style="color: #0a1f44;">
+                Upload an image of the incident or related evidence
+              </label>
+              <div class="card border-dashed p-3" style="border: 2px dashed #ced4da; border-radius: 8px;">
+                <div class="d-flex flex-column align-items-center">
+                  <div id="imagePreviewContainer" class="mb-3 text-center" style="display: none;">
+                    <img id="imagePreview" src="#" alt="Preview" class="img-fluid rounded" style="max-height: 200px;">
+                    <button type="button" class="btn btn-sm btn-danger mt-2" onclick="clearImage()">
+                      <i class="bi bi-trash"></i> Remove Image
+                    </button>
+                  </div>
+                  <div id="imageUploadArea" class="text-center">
+                    <i class="bi bi-image fs-1" style="color: #5e0b15;"></i>
+                    <p class="mt-2 mb-1">Drag & drop image here or click to browse</p>
+                    <p class="text-muted small mb-3">Supports JPG, PNG (Max 5MB)</p>
+                    <input type="file" class="d-none" id="incident_image" name="incident_image" accept="image/*" capture="camera">
+                    <button type="button" class="btn btn-sm me-2" style="background-color: #0a1f44; color: ivory;" onclick="document.getElementById('incident_image').click()">
+                      <i class="bi bi-upload"></i> Upload Image
+                    </button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary" onclick="captureImage()">
+                      <i class="bi bi-camera"></i> Take Photo
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Audio Upload Tab -->
+            <div class="tab-pane fade" id="audio-tab-pane" role="tabpanel" aria-labelledby="audio-tab">
+              <label class="form-label fw-medium" style="color: #0a1f44;">
+                Record or upload audio description of the incident
+              </label>
+              <div class="card border-dashed p-3" style="border: 2px dashed #ced4da; border-radius: 8px;">
+                <div class="d-flex flex-column align-items-center">
+                  <div id="audioPreviewContainer" class="mb-3 text-center" style="display: none;">
+                    <audio id="audioPreview" controls class="w-100"></audio>
+                    <button type="button" class="btn btn-sm btn-danger mt-2" onclick="clearAudio()">
+                      <i class="bi bi-trash"></i> Remove Audio
+                    </button>
+                  </div>
+                  <div id="audioUploadArea" class="text-center">
+                    <i class="bi bi-mic fs-1" style="color: #5e0b15;"></i>
+                    <p class="mt-2 mb-1">Record audio or upload existing recording</p>
+                    <p class="text-muted small mb-3">Supports MP3, WAV (Max 10MB)</p>
+                    <div class="d-flex justify-content-center gap-2">
+                      <input type="file" class="d-none" id="incident_audio" name="incident_audio" accept="audio/*">
+                      <button type="button" class="btn btn-sm" style="background-color: #0a1f44; color: ivory;" onclick="document.getElementById('incident_audio').click()">
+                        <i class="bi bi-upload"></i> Upload Audio
+                      </button>
+                      <button type="button" class="btn btn-sm btn-outline-secondary" id="recordButton">
+                        <i class="bi bi-mic"></i> Start Recording
+                      </button>
+                      <button type="button" class="btn btn-sm btn-danger" id="stopButton" style="display: none;">
+                        <i class="bi bi-stop-circle"></i> Stop
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
         
@@ -109,10 +196,10 @@
             <i class="bi bi-arrow-left-circle me-1"></i> Back to Cases
           </a>
           <div>
-            <button type="reset" class="btn btn-outline-danger me-2 px-4">
+            <button type="reset" class="btn btn-outline-danger me-2 px-4" onclick="resetForm()">
               <i class="bi bi-eraser me-1"></i> Clear Form
             </button>
-            <button type="submit" class="btn px-4" style="background: linear-gradient(135deg, #0a1f44 0%, #5e0b15 100%); color: ivory;">
+            <button type="submit" class="btn px-4" style="background: linear-gradient(135deg, #0a1f44 0%, #5e0b15 100%); color: ivory;" id="submitBtn">
               <i class="bi bi-file-earmark-check me-1"></i> Submit FIR
             </button>
           </div>
@@ -177,6 +264,27 @@
     color: #0a1f44;
   }
   
+  .border-dashed {
+    border-style: dashed !important;
+  }
+  
+  .nav-tabs .nav-link {
+    color: #0a1f44;
+    border: 1px solid transparent;
+    border-bottom: 3px solid transparent;
+  }
+  
+  .nav-tabs .nav-link:hover {
+    border-color: transparent;
+    color: #5e0b15;
+  }
+  
+  .nav-tabs .nav-link.active {
+    color: #5e0b15;
+    border-bottom: 3px solid #5e0b15;
+    background-color: transparent;
+  }
+  
   @media (max-width: 768px) {
     .d-flex.justify-content-between {
       flex-direction: column;
@@ -191,6 +299,17 @@
       width: 100%;
       margin-bottom: 0.5rem;
     }
+    
+    .nav-tabs {
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      white-space: nowrap;
+    }
+    
+    .nav-tabs .nav-item {
+      display: inline-block;
+      float: none;
+    }
   }
 </style>
 
@@ -200,9 +319,139 @@
     this.value = this.value.replace(/[^0-9]/g, '').substring(0, 10);
   });
   
-  // Aadhaar number formatting
-  document.getElementById('complainant_aadhaar').addEventListener('input', function(e) {
-    this.value = this.value.replace(/[^0-9]/g, '').substring(0, 12);
+  // Image handling
+  const imageInput = document.getElementById('incident_image');
+  const imagePreview = document.getElementById('imagePreview');
+  const imagePreviewContainer = document.getElementById('imagePreviewContainer');
+  const imageUploadArea = document.getElementById('imageUploadArea');
+  
+  imageInput.addEventListener('change', function() {
+    if (this.files && this.files[0]) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        imagePreview.src = e.target.result;
+        imagePreviewContainer.style.display = 'block';
+        imageUploadArea.style.display = 'none';
+      }
+      reader.readAsDataURL(this.files[0]);
+    }
   });
+  
+  function clearImage() {
+    imageInput.value = '';
+    imagePreview.src = '#';
+    imagePreviewContainer.style.display = 'none';
+    imageUploadArea.style.display = 'block';
+  }
+  
+  function captureImage() {
+    // This would use the device camera (implementation depends on specific requirements)
+    alert("Camera functionality would be implemented here for actual devices");
+    // For demo purposes, we'll just trigger the file input
+    imageInput.click();
+  }
+  
+  // Audio handling
+  const audioInput = document.getElementById('incident_audio');
+  const audioPreview = document.getElementById('audioPreview');
+  const audioPreviewContainer = document.getElementById('audioPreviewContainer');
+  const audioUploadArea = document.getElementById('audioUploadArea');
+  const recordButton = document.getElementById('recordButton');
+  const stopButton = document.getElementById('stopButton');
+  let mediaRecorder;
+  let audioChunks = [];
+  
+  audioInput.addEventListener('change', function() {
+    if (this.files && this.files[0]) {
+      audioPreview.src = URL.createObjectURL(this.files[0]);
+      audioPreviewContainer.style.display = 'block';
+      audioUploadArea.style.display = 'none';
+    }
+  });
+  
+  function clearAudio() {
+    audioInput.value = '';
+    audioPreview.src = '';
+    audioPreviewContainer.style.display = 'none';
+    audioUploadArea.style.display = 'block';
+    if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+      mediaRecorder.stop();
+    }
+  }
+  
+  // Audio recording functionality
+  recordButton.addEventListener('click', async function() {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      mediaRecorder = new MediaRecorder(stream);
+      audioChunks = [];
+      
+      mediaRecorder.ondataavailable = function(e) {
+        audioChunks.push(e.data);
+      };
+      
+      mediaRecorder.onstop = function() {
+        const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+        const audioUrl = URL.createObjectURL(audioBlob);
+        audioPreview.src = audioUrl;
+        
+        // Create a file from the blob and assign it to the input
+        const audioFile = new File([audioBlob], 'recording.wav', { type: 'audio/wav' });
+        const dataTransfer = new DataTransfer();
+        dataTransfer.items.add(audioFile);
+        audioInput.files = dataTransfer.files;
+        
+        audioPreviewContainer.style.display = 'block';
+        audioUploadArea.style.display = 'none';
+      };
+      
+      mediaRecorder.start();
+      recordButton.style.display = 'none';
+      stopButton.style.display = 'block';
+    } catch (err) {
+      console.error('Error accessing microphone:', err);
+      alert('Could not access microphone. Please check permissions.');
+    }
+  });
+  
+  stopButton.addEventListener('click', function() {
+    if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+      mediaRecorder.stop();
+      mediaRecorder.stream.getTracks().forEach(track => track.stop());
+      stopButton.style.display = 'none';
+      recordButton.style.display = 'block';
+    }
+  });
+  
+  // Form reset handler
+  function resetForm() {
+    clearImage();
+    clearAudio();
+    document.getElementById('incident_description').value = '';
+    document.getElementById('text-tab').click();
+  }
+  
+  // Form validation
+  document.getElementById('submitBtn').addEventListener('click', function(e) {
+    const textDesc = document.getElementById('incident_description').value.trim();
+    const hasImage = imageInput.files.length > 0;
+    const hasAudio = audioInput.files.length > 0;
+    
+    if (!textDesc && !hasImage && !hasAudio) {
+      e.preventDefault();
+      alert('Please provide incident details in at least one format (text, image, or audio)');
+      return false;
+    }
+    
+    return true;
+  });
+  
+  // Initialize Bootstrap tabs if not already initialized
+  if (typeof bootstrap !== 'undefined') {
+    const tabEls = document.querySelectorAll('button[data-bs-toggle="tab"]');
+    tabEls.forEach(tabEl => {
+      new bootstrap.Tab(tabEl);
+    });
+  }
 </script>
 {% endblock %}

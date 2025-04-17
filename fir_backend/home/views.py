@@ -17,6 +17,9 @@ from django.utils import timezone
 from xhtml2pdf import pisa
 from deep_translator import GoogleTranslator
 import joblib
+import easyocr
+import speech_recognition as sr
+from PIL import Image
 from .models import User, Station, FIR, LegalSuggestion, Notification
 
 logger = logging.getLogger(__name__)
@@ -31,10 +34,12 @@ def homepage(request):
 def load_ml_models():
     """Load ML models once at application startup"""
     try:
-        global ipc_model, vectorizer
+        global ipc_model, vectorizer, ocr_reader, speech_recognizer
         model_dir = os.path.join(settings.BASE_DIR, 'ml_models')
         ipc_model = joblib.load(os.path.join(model_dir, 'ipc_model.pkl'))
         vectorizer = joblib.load(os.path.join(model_dir, 'vectorizer.pkl'))
+        ocr_reader = easyocr.Reader(['en'])  # Initialize EasyOCR
+        speech_recognizer = sr.Recognizer()  # Initialize SpeechRecognizer
         logger.info("ML models loaded successfully")
         return True
     except Exception as e:
@@ -89,6 +94,49 @@ def predict_ipc_section(text):
     except Exception as e:
         logger.error(f"Prediction failed: {str(e)}")
         return "IPC 302", 0.75
+
+def process_image_upload(image_file):
+    """Process uploaded image using EasyOCR"""
+    try:
+        # Save temporary image file
+        temp_image_path = os.path.join(settings.MEDIA_ROOT, 'temp_ocr_image.jpg')
+        with open(temp_image_path, 'wb+') as destination:
+            for chunk in image_file.chunks():
+                destination.write(chunk)
+        
+        # Perform OCR
+        results = ocr_reader.readtext(temp_image_path)
+        extracted_text = ' '.join([result[1] for result in results])
+        
+        # Clean up
+        os.remove(temp_image_path)
+        
+        return extracted_text
+    except Exception as e:
+        logger.error(f"Image processing failed: {str(e)}")
+        return None
+
+def process_audio_upload(audio_file):
+    """Process uploaded audio using SpeechRecognition"""
+    try:
+        # Save temporary audio file
+        temp_audio_path = os.path.join(settings.MEDIA_ROOT, 'temp_speech_audio.wav')
+        with open(temp_audio_path, 'wb+') as destination:
+            for chunk in audio_file.chunks():
+                destination.write(chunk)
+        
+        # Perform speech recognition
+        with sr.AudioFile(temp_audio_path) as source:
+            audio_data = speech_recognizer.record(source)
+            text = speech_recognizer.recognize_google(audio_data)
+        
+        # Clean up
+        os.remove(temp_audio_path)
+        
+        return text
+    except Exception as e:
+        logger.error(f"Audio processing failed: {str(e)}")
+        return None
 
 # ======================
 # AUTHENTICATION VIEWS
@@ -264,8 +312,9 @@ def admin_fir_detail_view(request, pk):
         'officers': User.objects.filter(role='police_officer')
     })
 
-# Reports
-
+# ======================
+# OFFICER VIEWS
+# ======================
 
 @login_required
 @user_passes_test(is_police_officer)
@@ -300,17 +349,39 @@ def officer_fir_list_view(request):
 @user_passes_test(is_police_officer)
 def officer_fir_create_view(request):
     if request.method == 'POST':
+        incident_description = request.POST.get('incident_description')
+        
+        # Process image upload if present
+        if 'incident_image' in request.FILES:
+            image_text = process_image_upload(request.FILES['incident_image'])
+            if image_text:
+                incident_description = f"Image Text: {image_text}\n\nAdditional Details: {incident_description or ''}"
+        
+        # Process audio upload if present
+        if 'incident_audio' in request.FILES:
+            audio_text = process_audio_upload(request.FILES['incident_audio'])
+            if audio_text:
+                incident_description = f"Audio Transcript: {audio_text}\n\nAdditional Details: {incident_description or ''}"
+        
         fir = FIR.objects.create(
             fir_number=generate_fir_number(),
             complainant_name=request.POST.get('complainant_name'),
             complainant_contact=request.POST.get('complainant_contact'),
-            incident_description=request.POST.get('incident_description'),
+            incident_description=incident_description,
             incident_date=request.POST.get('incident_date'),
             incident_location=request.POST.get('incident_location'),
             police_officer=request.user,
             station=request.user.station,
             status='draft'
         )
+        
+        # Save uploaded files if needed
+        if 'incident_image' in request.FILES:
+            fir.incident_image = request.FILES['incident_image']
+        if 'incident_audio' in request.FILES:
+            fir.incident_audio = request.FILES['incident_audio']
+        fir.save()
+        
         messages.success(request, "FIR created successfully")
         return redirect('officer_fir_detail', pk=fir.pk)
     
@@ -346,6 +417,21 @@ def officer_fir_update_view(request, pk):
         fir.incident_description = request.POST.get('incident_description')
         fir.incident_date = request.POST.get('incident_date')
         fir.incident_location = request.POST.get('incident_location')
+        
+        # Process image update if present
+        if 'incident_image' in request.FILES:
+            image_text = process_image_upload(request.FILES['incident_image'])
+            if image_text:
+                fir.incident_description = f"Image Text: {image_text}\n\nAdditional Details: {fir.incident_description or ''}"
+            fir.incident_image = request.FILES['incident_image']
+        
+        # Process audio update if present
+        if 'incident_audio' in request.FILES:
+            audio_text = process_audio_upload(request.FILES['incident_audio'])
+            if audio_text:
+                fir.incident_description = f"Audio Transcript: {audio_text}\n\nAdditional Details: {fir.incident_description or ''}"
+            fir.incident_audio = request.FILES['incident_audio']
+        
         fir.save()
         messages.success(request, "FIR updated successfully")
         return redirect('officer_fir_detail', pk=pk)
@@ -354,7 +440,7 @@ def officer_fir_update_view(request, pk):
 
 @login_required
 @user_passes_test(is_police_officer)
-def generate_legal_suggestions_view(request, pk):  # Note the parameter name is 'pk'
+def generate_legal_suggestions_view(request, pk):
     fir = get_object_or_404(FIR, pk=pk)
     if not can_access_fir(request.user, fir):
         raise PermissionDenied
