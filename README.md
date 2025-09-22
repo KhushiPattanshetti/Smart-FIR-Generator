@@ -25,10 +25,4 @@ This project is a full-stack Django web application that automates the **FIR (Fi
 - **ML Libraries**: scikit-learn, NLTK, spaCy
 - **Other Tools**: EasyOCR, Google Speech-to-Text API
 
-##  Installation
-```bash
-git clone https://github.com/your-username/fir-automation.git
-cd fir-automation
-pip install -r requirements.txt
-python manage.py migrate
-python manage.py runserver
+
